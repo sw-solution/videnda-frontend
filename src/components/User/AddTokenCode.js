@@ -19,7 +19,7 @@ const AddTokenCode = () => {
 
   React.useEffect(()=>{
     AuthService.getUserProfile().then((response)=>{
-      setCurrentUser(response);  
+      setCurrentUser(response);
     });
   }, [])
 
@@ -75,7 +75,14 @@ const AddTokenCode = () => {
           </Button>
         </Col>
       </Row>
-      
+      <Row  className='mt-5'>
+        <Col md={4}>
+           <a href="https://exquisiteview.com/Tokens_c13.htm" target="_blank">Get More Tokens</a>
+        </Col>
+        <Col md={8}>
+        </Col>
+      </Row>
+
       { currentUser &&
         <header className="jumbotron mt-4">
           <h3 className='mb-4'><strong>{currentUser.username}</strong></h3>

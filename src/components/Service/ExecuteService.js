@@ -79,37 +79,6 @@ const ExecuteService = ()=>{
     <div className="container">
         <div className="row">
             <div className="col-md-6">
-                <InputGroup className="mb-3">
-                    <FormControl
-                        placeholder="City Name"
-                        aria-label="City Name"
-                        aria-describedby="basic-addon2"
-                        value={cityName}
-                        onChange={onChangeCityName}
-                    />
-                    <InputGroup.Append>
-                    <Button variant="outline-secondary" onClick={handleGetWeather} disabled={loading}>
-                        {loading && (
-                            <span className="spinner-border spinner-border-sm"></span>
-                        )}&nbsp;
-                        <span>Get Weather</span>
-                    </Button>
-                    </InputGroup.Append>
-                </InputGroup>
-                <div style={{wordBreak: "break-all"}}>
-                    <a href={`${API_URL}&user_id=${(userData==null)?"":userData.user_id}&user_key=${(userData==null)?"":userData.access_key}&city=${encodeURI(cityName)}`} rel="noreferrer" target="_blank">{`${API_URL}&user_id=${(userData==null)?"":userData.user_id}&user_key=${(userData==null)?"":userData.access_key}&city=${encodeURI(cityName)}`}</a>
-                </div>
-                {
-                    message &&
-                    <div className={successfully?"alert alert-success":"alert alert-danger"}>
-                        {message}
-                    </div>
-                }
-                <pre>
-                    {weather}
-                </pre>
-            </div>
-            <div className="col-md-6">
                 <Button variant="outline-secondary" onClick={handleGetTokenHistory} disabled={loading1}>
                     {loading1 && (
                         <span className="spinner-border spinner-border-sm"></span>
@@ -145,6 +114,37 @@ const ExecuteService = ()=>{
                     </table>
 
                 </div>
+            </div>
+            <div className="col-md-6">
+                <InputGroup className="mb-3">
+                    <FormControl
+                        placeholder="City Name"
+                        aria-label="City Name"
+                        aria-describedby="basic-addon2"
+                        value={cityName}
+                        onChange={onChangeCityName}
+                    />
+                    <InputGroup.Append>
+                    <Button variant="outline-secondary" onClick={handleGetWeather} disabled={loading}>
+                        {loading && (
+                            <span className="spinner-border spinner-border-sm"></span>
+                        )}&nbsp;
+                        <span>Get Weather</span>
+                    </Button>
+                    </InputGroup.Append>
+                </InputGroup>
+                <div style={{wordBreak: "break-all"}}>
+                    <a href={`${API_URL}&user_id=${(userData==null)?"":userData.user_id}&user_key=${(userData==null)?"":userData.access_key}&city=${encodeURI(cityName)}`} rel="noreferrer" target="_blank">{`${API_URL}&user_id=${(userData==null)?"":userData.user_id}&user_key=${(userData==null)?"":userData.access_key}&city=${encodeURI(cityName)}`}</a>
+                </div>
+                {
+                    message &&
+                    <div className={successfully?"alert alert-success":"alert alert-danger"}>
+                        {message}
+                    </div>
+                }
+                <pre>
+                    {weather}
+                </pre>
             </div>
         </div>
     </div>)
