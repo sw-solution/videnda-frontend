@@ -86,7 +86,6 @@ function App() {
                 </NavDropdown>
               )}
               <NavDropdown title='Services' id="collasible-nav-dropdown" alignRight >
-                <NavDropdown.Item href="/execute_service">Weather</NavDropdown.Item>
                 <NavDropdown.Item href="/upload_image">Upload Image</NavDropdown.Item>
                 <NavDropdown.Item href="/upload_video">Upload Video</NavDropdown.Item>
                 <NavDropdown.Item href="/playlists">Manage Playlist</NavDropdown.Item>
@@ -95,6 +94,7 @@ function App() {
               </NavDropdown>
               <NavDropdown title={currentUser.username} id="collasible-nav-dropdown" alignRight >
                 <NavDropdown.Item href="/add_token_code">Add Tokens</NavDropdown.Item>
+                <NavDropdown.Item href="/execute_service">Tokens History</NavDropdown.Item>
                 <NavDropdown.Item href="/profile">View Profile</NavDropdown.Item>
                 <NavDropdown.Item href="/changePassword">Change Password</NavDropdown.Item>
                 <NavDropdown.Item href="/deregister">Deregister</NavDropdown.Item>
@@ -109,7 +109,7 @@ function App() {
             )}
         </Navbar.Collapse>
       </Navbar>
-      
+
       <div className="container mt-3">
         <Switch>
           <Route exact path={["/", "/home"]} component={Home}></Route>
