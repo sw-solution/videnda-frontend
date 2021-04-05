@@ -9,11 +9,13 @@ import { Pagination } from '@material-ui/lab';
 import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import MButton from '@material-ui/core/Button';
+import { useHistory } from "react-router-dom";
+import Alert from '@material-ui/lab/Alert';
 
 import {
     Row,
     Col,
-    Alert,
     Image,
     Button,
     ListGroup,
@@ -36,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ImageUpload = () => {
-
     const [currentFile, setCurrentFile] = React.useState(undefined);
     const [previewImage, setPreviewImage] = React.useState(undefined);
     const [progress, setProgress] = React.useState(0);
@@ -61,7 +62,7 @@ const ImageUpload = () => {
         const selectedNode = localStorage.getItem('selected');
         let expand = ['root'];
         if (selectedNode) {
-            let y, m ,d;
+            let y, m, d;
             if (selectedNode.length === 4 && Number(selectedNode) > 1000) {
                 y = selectedNode
                 expand.push(y)
@@ -90,10 +91,10 @@ const ImageUpload = () => {
             children: [],
         };
         plain.forEach(value => {
-            let [year, month, day] = new Date(value.dateTime).toLocaleDateString('pt-br').split( '/' ).reverse( );
+            let [year, month, day] = new Date(value.dateTime).toLocaleDateString('pt-br').split('/').reverse();
 
             let index = data.children.findIndex(item => item.id === String(year))
-            if( index < 0) {
+            if (index < 0) {
                 data.children.push({
                     id: year.toString(),
                     name: year.toString(),
@@ -107,74 +108,74 @@ const ImageUpload = () => {
                     }]
                 })
             } else {
-                let month_index = data.children[index].children.findIndex(item => String(item.id) === year+'-'+month)
+                let month_index = data.children[index].children.findIndex(item => String(item.id) === year + '-' + month)
                 if (month_index < 0) {
                     data.children[index].children.push({
-                        id: year+'-'+month,
+                        id: year + '-' + month,
                         name: month,
                         children: [{
-                            id: year+'-'+month+'-'+day,
+                            id: year + '-' + month + '-' + day,
                             name: day,
                         }]
                     })
                 } else {
-                    let day_index = data.children[index].children[month_index].children.findIndex(item => String(item.id) === year+'-'+month+'-'+day)
+                    let day_index = data.children[index].children[month_index].children.findIndex(item => String(item.id) === year + '-' + month + '-' + day)
                     if (day_index < 0) {
                         data.children[index].children[month_index].children.push({
-                            id: year+'-'+month+'-'+day,
+                            id: year + '-' + month + '-' + day,
                             name: day,
                         })
                     }
                 }
             }
-            
+
         });
-        
+
         setTreeData(data);
     }
 
     React.useEffect(() => {
         ImageService.getImageFiles()
             .then(async response => {
-                if(response.data && response.data.length>0) {
+                if (response.data && response.data.length > 0) {
                     setImageData(response.data)
                     setTree(response.data)
-                    
+
                     ///////
                     const nodeId = localStorage.getItem('selected');
                     let data = await response.data.filter(item => {
-                        let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split( '/' ).reverse( );
-        
+                        let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split('/').reverse();
+
                         let selectedYear = '';
                         let selectedMonth = '';
                         let selectedDay = '';
-        
+
                         let fileName = item.file_name + item.description;
                         fileName = fileName.trim().toLowerCase();
-        
+
                         if (nodeId === 'root') {
-                                return 1;    
+                            return 1;
                         }
-        
+
                         let selectedDate = '';
                         if (String(nodeId).length === 4) {
                             selectedYear = String(nodeId);
                             if (selectedYear === year) {
-                                    return 1;    
+                                return 1;
                             }
                         }
-                    
+
                         if (String(nodeId).length >= 6) {
                             selectedDate = nodeId.split('-');
                             selectedYear = selectedDate[0];
                             selectedMonth = selectedDate[1];
                             if (selectedYear === year && selectedMonth === month && nodeId.split('-').length === 2) {
-                                    return 1;    
+                                return 1;
                             }
                             if (String(nodeId).length >= 8) {
                                 selectedDay = nodeId.split('-')[2];
                                 if (selectedYear === year && selectedMonth === month && selectedDay === day) {
-                                        return 1;    
+                                    return 1;
                                 } else {
                                     return 0;
                                 }
@@ -182,16 +183,16 @@ const ImageUpload = () => {
                         }
                         return 0;
                     });
-                    
+
                     setImageInfos(data);
-                    
-                    const total = Math.ceil(data.length/itemsPerPage);
+
+                    const total = Math.ceil(data.length / itemsPerPage);
                     setTotalPages(total);
                 }
             })
         ImageService.getAllImageFiles()
             .then(response => {
-                if(response.data && response.data.length>0) {
+                if (response.data && response.data.length > 0) {
                     setAllImage(response.data)
                 }
             })
@@ -209,11 +210,11 @@ const ImageUpload = () => {
             }, 2000)
             return ImageService.getImageFiles();
         }).then(files => {
-            if(files.data && files.data.length>0){
+            if (files.data && files.data.length > 0) {
                 setImageData(files.data);
                 setTree(files.data);
                 setImageInfos(files.data);
-                const total = Math.ceil(files.data.length/itemsPerPage);
+                const total = Math.ceil(files.data.length / itemsPerPage);
                 setTotalPages(total);
             }
         }).catch(error => {
@@ -240,28 +241,28 @@ const ImageUpload = () => {
         }
     }
 
-    const handleChangePageNumber = (pagenum)=>{
+    const handleChangePageNumber = (pagenum) => {
         setPageNumber(pagenum);
         localStorage.setItem('page', pagenum)
     }
 
-    const handleGoFirstPage = () =>{
+    const handleGoFirstPage = () => {
         setPageNumber(1);
     }
 
-    const handleGoLastPage = () =>{
+    const handleGoLastPage = () => {
         setPageNumber(totalPages);
     }
 
-    const handlePrevPage = () =>{
-        if(pageNumber>1){
+    const handlePrevPage = () => {
+        if (pageNumber > 1) {
             const page = pageNumber - 1;
             setPageNumber(page);
         }
     }
 
-    const handleNextPage = () =>{
-        if(pageNumber<totalPages){
+    const handleNextPage = () => {
+        if (pageNumber < totalPages) {
             const page = pageNumber + 1;
             setPageNumber(page);
         }
@@ -272,7 +273,7 @@ const ImageUpload = () => {
         const keyword = key.trim().toLowerCase();
         const nodeId = selected;
         let data = allImage.filter(item => {
-            let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split( '/' ).reverse( );
+            let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split('/').reverse();
 
             let selectedYear = '';
             let selectedMonth = '';
@@ -283,7 +284,7 @@ const ImageUpload = () => {
 
             if (nodeId === 'root') {
                 if (keyword === "") {
-                    return 1;    
+                    return 1;
                 } else {
                     if (fileName.includes(keyword)) {
                         return 1;
@@ -296,7 +297,7 @@ const ImageUpload = () => {
                 selectedYear = String(nodeId);
                 if (selectedYear === year) {
                     if (keyword === "") {
-                        return 1;    
+                        return 1;
                     } else {
                         if (fileName.includes(keyword)) {
                             return 1;
@@ -304,14 +305,14 @@ const ImageUpload = () => {
                     }
                 }
             }
-        
+
             if (String(nodeId).length >= 6) {
                 selectedDate = nodeId.split('-');
                 selectedYear = selectedDate[0];
                 selectedMonth = selectedDate[1];
                 if (selectedYear === year && selectedMonth === month && nodeId.split('-').length === 2) {
                     if (keyword === "") {
-                        return 1;    
+                        return 1;
                     } else {
                         if (fileName.includes(keyword)) {
                             return 1;
@@ -322,7 +323,7 @@ const ImageUpload = () => {
                     selectedDay = nodeId.split('-')[2];
                     if (selectedYear === year && selectedMonth === month && selectedDay === day) {
                         if (keyword === "") {
-                            return 1;    
+                            return 1;
                         } else {
                             if (fileName.includes(keyword)) {
                                 return 1;
@@ -335,9 +336,9 @@ const ImageUpload = () => {
             }
             return 0;
         });
-        
+
         setImageInfos(data);
-    
+
         const total = Math.ceil(data.length / itemsPerPage);
         setTotalPages(total);
 
@@ -354,7 +355,7 @@ const ImageUpload = () => {
             localStorage.setItem("selected", nodeId);
             setExpand();
             let data = imageData.filter(item => {
-                let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split( '/' ).reverse( );
+                let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split('/').reverse();
 
                 let selectedYear = '';
                 let selectedMonth = '';
@@ -365,7 +366,7 @@ const ImageUpload = () => {
 
                 if (nodeId === 'root') {
                     if (keyword === "") {
-                        return 1;    
+                        return 1;
                     } else {
                         if (fileName.includes(keyword)) {
                             return 1;
@@ -378,7 +379,7 @@ const ImageUpload = () => {
                     selectedYear = String(nodeId);
                     if (selectedYear === year) {
                         if (keyword === "") {
-                            return 1;    
+                            return 1;
                         } else {
                             if (fileName.includes(keyword)) {
                                 return 1;
@@ -386,14 +387,14 @@ const ImageUpload = () => {
                         }
                     }
                 }
-            
+
                 if (String(nodeId).length >= 6) {
                     selectedDate = nodeId.split('-');
                     selectedYear = selectedDate[0];
                     selectedMonth = selectedDate[1];
                     if (selectedYear === year && selectedMonth === month && nodeId.split('-').length === 2) {
                         if (keyword === "") {
-                            return 1;    
+                            return 1;
                         } else {
                             if (fileName.includes(keyword)) {
                                 return 1;
@@ -404,7 +405,7 @@ const ImageUpload = () => {
                         selectedDay = nodeId.split('-')[2];
                         if (selectedYear === year && selectedMonth === month && selectedDay === day) {
                             if (keyword === "") {
-                                return 1;    
+                                return 1;
                             } else {
                                 if (fileName.includes(keyword)) {
                                     return 1;
@@ -417,9 +418,9 @@ const ImageUpload = () => {
                 }
                 return 0;
             });
-            
+
             setImageInfos(data);
-        
+
             const total = Math.ceil(data.length / itemsPerPage);
             setTotalPages(total);
         }
@@ -432,10 +433,12 @@ const ImageUpload = () => {
 
     const renderTree = (nodes) => {
         return (
-        <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
-            {Array.isArray(nodes.children) ? nodes.children.map((node) => renderTree(node)) : null}
-        </TreeItem>
-    )}
+            <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
+                {Array.isArray(nodes.children) ? nodes.children.map((node) => renderTree(node)) : null}
+            </TreeItem>
+        )
+    }
+
 
     return (
         <>
@@ -457,7 +460,7 @@ const ImageUpload = () => {
                     {currentFile && (
                         < ProgressBar className="my-3" min={0} max={100} now={progress} label={`${progress}%`} striped />
                     )}
-                    
+
                     {message && (
                         <Alert variant="success" className="mt-3 upload_alert" show={alertVisible}>
                             <Alert.Heading>Upload Completed!</Alert.Heading>
@@ -466,7 +469,7 @@ const ImageUpload = () => {
                     )}
                 </Col>
             </Row>
-            
+
             <Row>
                 <Col md={3} className="card">
                     <TreeView
@@ -482,17 +485,17 @@ const ImageUpload = () => {
                 </Col>
                 <Col md={9}>
                     {imageInfos
-                    && <ImageList 
-                        image_list={imageInfos}
-                        totalPages={totalPages}
-                        itemsPerPage={itemsPerPage}
-                        currentPage={pageNumber}
-                        onChangeKeyword={handleChangeKeyword}
-                        onChangePageNumber={handleChangePageNumber}
-                        onGoFirstPage={handleGoFirstPage}
-                        onGoLastPage={handleGoLastPage}
-                        onNextPage={handleNextPage}
-                        onPrevPage={handlePrevPage}
+                        && <ImageList
+                            image_list={imageInfos}
+                            totalPages={totalPages}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={pageNumber}
+                            onChangeKeyword={handleChangeKeyword}
+                            onChangePageNumber={handleChangePageNumber}
+                            onGoFirstPage={handleGoFirstPage}
+                            onGoLastPage={handleGoLastPage}
+                            onNextPage={handleNextPage}
+                            onPrevPage={handlePrevPage}
                         />
                     }
                 </Col>
@@ -502,9 +505,71 @@ const ImageUpload = () => {
 }
 
 const ImageList = (props) => {
+    let history = useHistory();
+    const [ErrorMessage, setErrorMessage] = React.useState('');
+
     const classes = useStyles();
 
-    const getFileName = (filename) =>{
+    const handleImageDownload = (url, imageid) => {
+        ImageService.downloadImage(url).then((res) => {
+            downloadFile(res.data, imageid + '.jpg')
+        }).catch((err) => {
+
+            err.response.data.text().then(res => {
+                let eMessage = JSON.parse(res).message
+                if (eMessage === 'Not Enough Tokens.') {
+                    setErrorMessage(eMessage + ' \nPlease take your tokens.');
+                    setTimeout(() => {
+                        setErrorMessage('');
+                    }, 5000);
+                } else {
+                    setErrorMessage(eMessage);
+                }
+            })
+
+        })
+    }
+    const downloadFile = (data, filename, mime, bom) => {
+        var blobData = (typeof bom !== 'undefined') ? [bom, data] : [data]
+        var blob = new Blob(blobData, { type: mime || 'application/octet-stream' });
+        if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            // IE workaround for "HTML7007: One or more blob URLs were
+            // revoked by closing the blob for which they were created.
+            // These URLs will no longer resolve as the data backing
+            // the URL has been freed."
+            window.navigator.msSaveBlob(blob, filename);
+        }
+        else {
+            var blobURL = (window.URL && window.URL.createObjectURL) ? window.URL.createObjectURL(blob) : window.webkitURL.createObjectURL(blob);
+            var tempLink = document.createElement('a');
+            tempLink.style.display = 'none';
+            tempLink.href = blobURL;
+            tempLink.setAttribute('download', filename);
+
+            // Safari thinks _blank anchor are pop ups. We only want to set _blank
+            // target if the browser does not support the HTML5 download attribute.
+            // This allows you to download files in desktop safari if pop up blocking
+            // is enabled.
+            if (typeof tempLink.download === 'undefined') {
+                tempLink.setAttribute('target', '_blank');
+            }
+
+            document.body.appendChild(tempLink);
+            tempLink.click();
+
+            // Fixes "webkit blob resource error 1"
+            setTimeout(function () {
+                document.body.removeChild(tempLink);
+                window.URL.revokeObjectURL(blobURL);
+            }, 200)
+        }
+
+    }
+
+
+
+
+    const getFileName = (filename) => {
         let fname = filename.split("_");
         fname.shift();
         return fname.join("_");
@@ -515,11 +580,11 @@ const ImageList = (props) => {
                 <Image thumbnail src={data.thumb_url} className="mr-3" />
                 <Media.Body>
                     <h5><span>{`${data.id_counter}. File Name : `}</span><span>{getFileName(data.file_name)}</span></h5>
-                    <p style={{marginBottom: "0px"}}><span>Id : </span><span>{data.image_id}</span></p>
-                    <p style={{marginBottom: "0px"}}><small><span>Created Time : </span><span>{data.dateTime}</span></small></p>
+                    <p style={{ marginBottom: "0px" }}><span>Id : </span><span>{data.image_id}</span></p>
+                    <p style={{ marginBottom: "0px" }}><small><span>Created Time : </span><span>{data.dateTime}</span></small></p>
                     <p><small><span>Description : </span><span>{data.description || "No description"}</span></small></p>
                     <Link to={`/edit_image/${data.image_id}`}><Button variant="success" size="sm" className="mr-3">Edit Image</Button></Link>
-                    <Button variant="primary" size="sm" href={data.url}>Download</Button>
+                    <Button variant="primary" onClick={() => handleImageDownload(data.url, data.image_id)} size="sm">Download</Button>
                 </Media.Body>
             </Media>
         </ListGroup.Item>
@@ -534,7 +599,7 @@ const ImageList = (props) => {
                 shape="rounded"
                 count={props.totalPages}
                 page={props.currentPage}
-                onChange={(event, val)=>props.onChangePageNumber(val)}
+                onChange={(event, val) => props.onChangePageNumber(val)}
             />
         );
     }
@@ -556,21 +621,42 @@ const ImageList = (props) => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                        <SearchIcon />
-                        </InputAdornment>
-                    ),
-                }}
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
                 />
                 <h3 className="card-header">List of Images</h3>
                 <ListGroup variant="flush">
                     {props.image_list
                         && props.image_list.map((img, index) => {
-                            if((props.currentPage-1)*props.itemsPerPage <=index && (props.currentPage)*props.itemsPerPage > index )
-                            return renderItem(img)
+                            if ((props.currentPage - 1) * props.itemsPerPage <= index && (props.currentPage) * props.itemsPerPage > index)
+                                return renderItem(img)
                         })}
                 </ListGroup>
                 {showPagenationItem()}
             </div>
+
+            {ErrorMessage &&
+                <div>
+                    <Alert
+                        severity='error'
+                        style={{ position: 'fixed', bottom: 50, right: 50, zIndex: 9999, padding: '20px 40px' }}
+                        action={
+                            <MButton
+                                color="inherit" size="medium"
+                                onClick={() => {
+                                    history.push('/add_token_code');
+                                }}
+                            >
+                                Get Tokens
+                        </MButton>
+                        }
+                    >
+                        {ErrorMessage}
+                    </Alert>
+                </div>
+            }
         </>
     );
 }

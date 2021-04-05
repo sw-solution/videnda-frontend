@@ -311,16 +311,10 @@ const EditImage = (props) => {
         }
     }
 
-    const handleImageDownload = (url) => {
+    const handleImageDownload = (url, imageid) => {
         imageService.downloadImage(url).then((res) => {
-            const file = new Blob([res.data], { type: res.headers['content-type'] })
-            console.log(file)
-            const url = window.URL.createObjectURL(file);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'Hello.jpg'); //or any other extension
-            document.body.appendChild(link);
-            link.click();
+            console.log(res.headers)
+            downloadFile(res.data, imageid + '.jpg')
         }).catch((err) => {
             console.log(err)
             const resMessage = (
@@ -338,6 +332,45 @@ const EditImage = (props) => {
                 setErrorMessage(resMessage);
             }
         })
+    }
+
+
+
+    const downloadFile = (data, filename, mime, bom) => {
+        var blobData = (typeof bom !== 'undefined') ? [bom, data] : [data]
+        var blob = new Blob(blobData, { type: mime || 'application/octet-stream' });
+        if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            // IE workaround for "HTML7007: One or more blob URLs were
+            // revoked by closing the blob for which they were created.
+            // These URLs will no longer resolve as the data backing
+            // the URL has been freed."
+            window.navigator.msSaveBlob(blob, filename);
+        }
+        else {
+            var blobURL = (window.URL && window.URL.createObjectURL) ? window.URL.createObjectURL(blob) : window.webkitURL.createObjectURL(blob);
+            var tempLink = document.createElement('a');
+            tempLink.style.display = 'none';
+            tempLink.href = blobURL;
+            tempLink.setAttribute('download', filename);
+
+            // Safari thinks _blank anchor are pop ups. We only want to set _blank
+            // target if the browser does not support the HTML5 download attribute.
+            // This allows you to download files in desktop safari if pop up blocking
+            // is enabled.
+            if (typeof tempLink.download === 'undefined') {
+                tempLink.setAttribute('target', '_blank');
+            }
+
+            document.body.appendChild(tempLink);
+            tempLink.click();
+
+            // Fixes "webkit blob resource error 1"
+            setTimeout(function () {
+                document.body.removeChild(tempLink);
+                window.URL.revokeObjectURL(blobURL);
+            }, 200)
+        }
+
     }
 
 
@@ -372,7 +405,7 @@ const EditImage = (props) => {
                                     Edit Description
                                 </Button>
                                 <Button variant="primary" className="my-3 mr-2"
-                                    onClick={() => handleImageDownload(`${back_end_server}/api/image/getImageFile/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=download`)}
+                                    onClick={() => handleImageDownload(`${back_end_server}/api/image/getImageFile/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=download`, imageId)}
                                 >                                    Download
                                 </Button>
                             </div>

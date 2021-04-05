@@ -43,10 +43,10 @@ class ImageService {
     }
 
     downloadImage(url) {
-        return axios.get(url, {
-            headers: {
-                Accept: "image / avif, image/ webp, image/ apng, image / svg + xml, image/*,*/ *; q = 0.8"
-            }
+        return axios({
+            url: url,
+            method: 'GET',
+            responseType: 'blob', // Important
         });
     }
 }
