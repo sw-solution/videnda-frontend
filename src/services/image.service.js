@@ -7,9 +7,9 @@ const IMAGE_API_URL = `${BASE_API_URL}image/`;
 
 class ImageService {
 
-    rotateImage({imageId, degree, clock}){
+    rotateImage({ imageId, degree, clock }) {
         const currentUser = Auth.getCurrentUser();
-        return axios.get(`${IMAGE_API_URL}rotateImage/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&degree=${degree}&clock=${clock?'yes':'no'}`);
+        return axios.get(`${IMAGE_API_URL}rotateImage/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&degree=${degree}&clock=${clock ? 'yes' : 'no'}`);
     }
 
     getImageFiles() {
@@ -22,24 +22,32 @@ class ImageService {
         return axios.get(`${IMAGE_API_URL}getAllImageFile?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
     }
 
-    getImage(imageId){
+    getImage(imageId) {
         const currentUser = Auth.getCurrentUser();
         return `${IMAGE_API_URL}getImageFile/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=preview`;
     }
 
-    getImageHistory(imageId){
+    getImageHistory(imageId) {
         const currentUser = Auth.getCurrentUser();
         return axios.get(`${IMAGE_API_URL}getImageHistory/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
     }
 
-    removeImage(imageId){
+    removeImage(imageId) {
         const currentUser = Auth.getCurrentUser();
         return axios.post(`${IMAGE_API_URL}removeImage/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
     }
 
-    addImageDescription({imageId, imageDescription}) {
+    addImageDescription({ imageId, imageDescription }) {
         const currentUser = Auth.getCurrentUser();
         return axios.post(`${IMAGE_API_URL}addImageDescription/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&image_description=${imageDescription}`);
+    }
+
+    downloadImage(url) {
+        return axios.get(url, {
+            headers: {
+                Accept: "image / avif, image/ webp, image/ apng, image / svg + xml, image/*,*/ *; q = 0.8"
+            }
+        });
     }
 }
 
