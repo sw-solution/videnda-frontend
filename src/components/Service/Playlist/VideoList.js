@@ -146,7 +146,7 @@ export default (props) => {
                 ) || err.toString();
 
                 if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage + '. \nPlease take your tokens.');
+                    setErrorText(resMessage);
                     setTimeout(() => {
                         setErrorText('');
                     }, 5000);
@@ -177,7 +177,7 @@ export default (props) => {
                 ) || err.toString();
 
                 if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage + '\nPlease take your tokens.');
+                    setErrorText(resMessage);
                     setTimeout(() => {
                         setErrorText('');
                     }, 5000);
@@ -208,7 +208,7 @@ export default (props) => {
                 ) || err.toString();
 
                 if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage + '\nPlease take your tokens.');
+                    setErrorText(resMessage);
                     setTimeout(() => {
                         setErrorText('');
                     }, 5000);
@@ -250,7 +250,7 @@ export default (props) => {
                 ) || err.toString();
 
                 if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage + '\nPlease take your tokens.');
+                    setErrorText(resMessage);
                     setTimeout(() => {
                         setErrorText('');
                     }, 5000);
@@ -297,7 +297,7 @@ export default (props) => {
                                     history.push('/add_token_code');
                                 }}
                             >
-                                Get Tokens
+                                Take More Tokens
                         </MButton>
                         }
                     >

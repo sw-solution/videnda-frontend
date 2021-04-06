@@ -12,24 +12,32 @@ class PPTService {
         return axios.get(`${PPT_API_URL}getPPTFile?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
     }
 
-    getPPT(pptId){
+    getPPT(pptId) {
         const currentUser = Auth.getCurrentUser();
         return `${PPT_API_URL}getPPTFile/${pptId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=preview`;
     }
 
-    getPPTHistory(pptId){
+    getPPTHistory(pptId) {
         const currentUser = Auth.getCurrentUser();
         return axios.get(`${PPT_API_URL}getPPTHistory/${pptId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
     }
 
-    rotateImage({imageId, degree, clock}){
+    rotateImage({ imageId, degree, clock }) {
         const currentUser = Auth.getCurrentUser();
-        return axios.get(`${PPT_API_URL}rotateImage/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&degree=${degree}&clock=${clock?'yes':'no'}`);
+        return axios.get(`${PPT_API_URL}rotateImage/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&degree=${degree}&clock=${clock ? 'yes' : 'no'}`);
     }
 
-    addNewSlidePPT({pptId}){
+    addNewSlidePPT({ pptId }) {
         const currentUser = Auth.getCurrentUser();
         return axios.get(`${PPT_API_URL}addNewSlidePPT/${pptId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
+    }
+
+    downloadpppt(url) {
+        return axios({
+            url: url,
+            method: 'GET',
+            responseType: 'blob', // Important
+        });
     }
 }
 
