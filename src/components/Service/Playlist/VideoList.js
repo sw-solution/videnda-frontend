@@ -316,7 +316,7 @@ const VideoList = (props) => {
     const renderItem = (data) => (
         <ListGroup.Item key={data.id}>
             <Media>
-                <Image thumbnail src={data.meta_image} className="mr-3" />
+                <Image thumbnail src={data.meta_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)} />
                 <Media.Body>
                     <h5><span>{data.manual_title || data.meta_title}</span></h5>
                     <p style={{ marginBottom: "0px" }}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
