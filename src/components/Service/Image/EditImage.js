@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Stage, Layer, Image } from 'react-konva';
 import {
@@ -16,7 +17,12 @@ import Form from 'react-bootstrap/Form'
 import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, responsiveFontSizes } from '@material-ui/core/styles';
+import Alert from '@material-ui/lab/Alert';
+import MButton from '@material-ui/core/Button';
+import { useHistory } from "react-router-dom";
+import imageService from '../../../services/image.service';
+import downloadFile from '../../../services/downloadfile'
 
 const back_end_server = GlobalData.back_end_server_ip + ":" + GlobalData.back_end_server_port;
 
@@ -79,6 +85,8 @@ const EditImage = (props) => {
     const [modalShow, setModalShow] = React.useState(false);
     const [isRotate, setIsRotate] = useState(undefined)
     const [isEditDescription, setIsEditDescription] = useState(undefined)
+
+    let history = useHistory();
 
     React.useEffect(() => {
         ImageService.getImageFiles()
@@ -148,7 +156,14 @@ const EditImage = (props) => {
                 err.response.data.message
             ) || err.toString();
             setIsLoading(false);
-            setErrorMessage(resMessage);
+            if (err.response.data.message === 'Not Enough Tokens') {
+                setErrorMessage('Not enough token - please take your tokens');
+                setTimeout(() => {
+                    setErrorMessage('');
+                }, 5000);
+            } else {
+                setErrorMessage(resMessage);
+            }
         });
         setIsRotate(true);
     }
@@ -177,7 +192,14 @@ const EditImage = (props) => {
                 err.response.data.message
             ) || err.toString();
             setIsLoading(false);
-            setErrorMessage(resMessage);
+            if (err.response.data.message === 'Not Enough Tokens') {
+                setErrorMessage('Not enough token - please take your tokens');
+                setTimeout(() => {
+                    setErrorMessage('');
+                }, 5000);
+            } else {
+                setErrorMessage(resMessage);
+            }
         })
     }
 
@@ -290,6 +312,25 @@ const EditImage = (props) => {
         }
     }
 
+    const handleImageDownload = (url, imageid) => {
+        imageService.downloadImage(url).then((res) => {
+            downloadFile(res.data, imageid + '.jpg')
+        }).catch((err) => {
+            setIsLoading(false);
+            err.response.data.text().then(res => {
+                let eMessage = JSON.parse(res).message
+                if (eMessage === 'Not Enough Tokens.') {
+                    setErrorMessage('Not enough token - please take your tokens');
+                    setTimeout(() => {
+                        setErrorMessage('');
+                    }, 5000);
+                } else {
+                    setErrorMessage(eMessage);
+                }
+            })
+        })
+    }
+
     const classes = useStyles();
 
     return (
@@ -321,13 +362,13 @@ const EditImage = (props) => {
                                     Edit Description
                                 </Button>
                                 <Button variant="primary" className="my-3 mr-2"
-                                    href={`${back_end_server}/api/image/getImageFile/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=download`}>
-                                    Download
+                                    onClick={() => handleImageDownload(`${back_end_server}/api/image/getImageFile/${imageId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=download`, imageId)}
+                                >                                    Download
                                 </Button>
                             </div>
                         </div>
                     </div>
-                    
+
                     <MyVerticallyCenteredModal
                         show={modalShow}
                         onHide={() => setModalShow(false)}
@@ -337,34 +378,49 @@ const EditImage = (props) => {
                     />
                 </div>
                 <div className='col-lg-6 mt-5 mt-lg-0'>
-                        <TextField
-                            className={classes.margin}
-                            placeholder="Search"
-                            onKeyDown={doSomethingWith}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                        <ImageHistory
-                            imageHistory={imageHistory}
-                            activeImageId={imageId}
-                            onRemove={removeImage}
-                            totalPage={totalPage}
-                            currentPage={pageNumber}
-                            itemsPerPage={itemsPerPage}
-                            itemClick={onClickHistory}
-                            onChangePageNumber={handleChangePageNumber}
-                        />
-                        <Pagination color="primary" shape="rounded" className="m-3" count={totalPage} page={pageNumber} onChange={(event, val) => setPageNumber(val)} />
+                    <TextField
+                        className={classes.margin}
+                        placeholder="Search"
+                        onKeyDown={doSomethingWith}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                    <ImageHistory
+                        imageHistory={imageHistory}
+                        activeImageId={imageId}
+                        onRemove={removeImage}
+                        totalPage={totalPage}
+                        currentPage={pageNumber}
+                        itemsPerPage={itemsPerPage}
+                        itemClick={onClickHistory}
+                        onChangePageNumber={handleChangePageNumber}
+                    />
+                    <Pagination color="primary" shape="rounded" className="m-3" count={totalPage} page={pageNumber} onChange={(event, val) => setPageNumber(val)} />
                 </div>
             </div>
             {errorMessage && (
                 <div>
-                    {errorMessage}
+                    <Alert
+                        severity='error'
+                        style={{ position: 'fixed', bottom: 50, right: 50, zIndex: 9999, padding: '20px 40px' }}
+                        action={
+                            <MButton
+                                color="inherit" size="medium"
+                                onClick={() => {
+                                    history.push('/add_token_code');
+                                }}
+                            >
+                                Take More Tokens
+                        </MButton>
+                        }
+                    >
+                        {errorMessage}
+                    </Alert>
                 </div>
             )}
         </div>

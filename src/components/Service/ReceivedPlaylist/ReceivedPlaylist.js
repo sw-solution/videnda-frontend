@@ -124,7 +124,8 @@ export default function CustomPaginationActionsTable() {
     if (!isLoaded) {
       ReceivedPlaylistService.getAllPlaylist()
         .then(async response => {
-          if(response.data && response.data.length > 0) {
+          console.log('-->', response.data)
+          if (response.data && response.data.length > 0) {
             setData(response.data);
             setRows(response.data);
           }
@@ -146,17 +147,17 @@ export default function CustomPaginationActionsTable() {
   const handleDelete = (id) => {
     ReceivedPlaylistService.removePlaylist(id)
       .then(response => {
-          if (response.data.message === "success") {
-              window.location.reload();
-          }
+        if (response.data.message === "success") {
+          window.location.reload();
+        }
       }).catch((err) => {
-          const resMessage = (
-              err.response &&
-              err.response.data &&
-              err.response.data.message
-          ) || err.toString();
+        const resMessage = (
+          err.response &&
+          err.response.data &&
+          err.response.data.message
+        ) || err.toString();
 
-          console.log(resMessage);
+        console.log(resMessage);
       });
   }
 
@@ -183,23 +184,23 @@ export default function CustomPaginationActionsTable() {
     const playlist_id = newPlaylistUrl.split('/playlist/')[1];
     ReceivedPlaylistService.addPlaylist(playlist_id)
       .then(response => {
-          if (response.data.message === "success") {
-              window.location.reload();
-          }
-          if (response.data.message === "cannotregister") {
-              setErrorText('The playlist is already registered.');
-              setTimeout(() => {
-                setErrorText('');
-              }, 2000);
-          }
+        if (response.data.message === "success") {
+          window.location.reload();
+        }
+        if (response.data.message === "cannotregister") {
+          setErrorText('The playlist is already registered.');
+          setTimeout(() => {
+            setErrorText('');
+          }, 2000);
+        }
       }).catch((err) => {
-          const resMessage = (
-              err.response &&
-              err.response.data &&
-              err.response.data.message
-          ) || err.toString();
+        const resMessage = (
+          err.response &&
+          err.response.data &&
+          err.response.data.message
+        ) || err.toString();
 
-          console.log(resMessage);
+        console.log(resMessage);
       });
 
     document.getElementById('input-with-icon-textfield').value = '';
@@ -209,9 +210,9 @@ export default function CustomPaginationActionsTable() {
   return (
     <>
       {errorText &&
-          <h5 className="alert alert-danger" style={{position: 'absolute', bottom: 50, right: 50, padding: 40}}>{errorText}</h5>
+        <h5 className="alert alert-danger" style={{ position: 'absolute', bottom: 50, right: 50, padding: 40 }}>{errorText}</h5>
       }
-      <Row  className='mt-5'>
+      <Row className='mt-5'>
         <Col md={5}>
           <TextField
             className={classes.pasteTextField}
@@ -220,11 +221,11 @@ export default function CustomPaginationActionsTable() {
             onChange={(e) => setNewPlaylistUrl(e.target.value)}
             onKeyDown={handleInsertPlaylist}
             InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <InsertLink />
-                  </InputAdornment>
-            ),
+              startAdornment: (
+                <InputAdornment position="start">
+                  <InsertLink />
+                </InputAdornment>
+              ),
             }}
           />
         </Col>
@@ -241,16 +242,16 @@ export default function CustomPaginationActionsTable() {
             onChange={(e) => setSearchString(e.target.value)}
             onKeyDown={handleSearch}
             InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-            ),
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
             }}
           />
         </Col>
       </Row>
-      
+
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">
           <TableHead>
@@ -289,7 +290,7 @@ export default function CustomPaginationActionsTable() {
                   {row.dateTime}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="center">
-                  <Button size='sm' style={{marginRight: 5}} href={front_end_server + '/playlist/' + row.playlist_id} target='_blank'>Open</Button>
+                  <Button size='sm' style={{ marginRight: 5 }} href={front_end_server + '/playlist/' + row.playlist_id} target='_blank'>Open</Button>
                   <Button size='sm' variant='danger' onClick={() => handleDelete(row.id)}>Delete</Button>
                 </TableCell>
               </TableRow>
