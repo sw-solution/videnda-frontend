@@ -17,7 +17,13 @@ const getTokenHistory=()=>{
     return axios.get(`${API_URL}server=get_tokenHistory&user_id=${user.user_id}`);
 }
 
+const getDashboard=()=>{
+    const user=AuthService.getCurrentUser();
+    return axios.get(`${API_URL}server=get_dashboard&user_id=${user.user_id}`);
+}
+
 export default {
     getWeather,
     getTokenHistory,
+    getDashboard,
 };

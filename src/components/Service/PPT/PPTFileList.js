@@ -102,14 +102,10 @@ const PPTList = ({ pptList }) => {
         }).catch((err) => {
             err.response.data.text().then(res => {
                 let eMessage = JSON.parse(res).message
-                if (eMessage === 'Not Enough Tokens.') {
-                    setErrorMessage('Not enough token - please take your tokens');
-                    setTimeout(() => {
-                        setErrorMessage('');
-                    }, 5000);
-                } else {
-                    setErrorMessage(eMessage);
-                }
+                setErrorMessage(eMessage);
+                setTimeout(() => {
+                    setErrorMessage('');
+                }, 5000);
             })
         })
     }

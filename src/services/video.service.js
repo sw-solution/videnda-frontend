@@ -9,7 +9,13 @@ const VIDEO_API_URL = `${BASE_API_URL}video/`
 class VideoService {
   uploadVideo(video_id) {
     const currentUser = Auth.getCurrentUser();
-    return axios.post(`${VIDEO_API_URL}uploadVideo?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`);
+    let data = {
+      user_id: currentUser.user_id,
+      access_key: currentUser.access_key,
+      video_id: video_id
+    }
+
+    return axios.post(`${VIDEO_API_URL}uploadVideo`, data );
   }
 
   addPlaylistIds(video_id, playlist_ids) {
@@ -30,6 +36,15 @@ class VideoService {
   setManualInfo(videoId, manual_title, manual_description) {
     const currentUser = Auth.getCurrentUser();
     return axios.post(`${VIDEO_API_URL}setManualInfo/${videoId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&manual_title=${manual_title}&manual_description=${manual_description}`);
+  }
+
+  setVideoType(videoId, type) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.post(`${VIDEO_API_URL}setType/${videoId}`, {
+        user_id: currentUser.user_id,
+        user_key: currentUser.access_key,
+        type: type,
+      });
   }
 
   changeVideoGroup(id, playlist_id) {

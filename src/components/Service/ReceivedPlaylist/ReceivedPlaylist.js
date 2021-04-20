@@ -19,18 +19,19 @@ import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InsertLink from '@material-ui/icons/InsertLink';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
 
 import {
   Row,
   Col,
   Button,
+  Image
 } from 'react-bootstrap';
 
 import ReceivedPlaylistService from '../../../services/received-playlist.service';
 import GlobalData from '../../../tools/GlobalData';
 
 const front_end_server = GlobalData.front_end_server_ip + ":" + GlobalData.front_end_server_port;
-//const back_end_server = GlobalData.back_end_server_ip + ":3000";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -257,10 +258,11 @@ export default function CustomPaginationActionsTable() {
           <TableHead>
             <TableRow>
               <TableCell>No</TableCell>
-              <TableCell align="center">Playlist Title</TableCell>
+              <TableCell align="center">Thumbnail</TableCell>
+              <TableCell align="center">Title</TableCell>
               <TableCell align="center">Sender</TableCell>
               <TableCell align="center">Video Count</TableCell>
-              <TableCell align="center">Playlist Status</TableCell>
+              <TableCell align="center">Status</TableCell>
               <TableCell align="center">Received Date</TableCell>
               <TableCell align="center">Operate</TableCell>
             </TableRow>
@@ -275,7 +277,14 @@ export default function CustomPaginationActionsTable() {
                   {index + 1}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="center">
-                  {row.playlist_title}
+                  <a href={front_end_server + '/playlist/' + row.playlist_id} target="_blank">
+                    { row.thumb_image && <Image src={ row.thumb_image } style={{ objectFit: 'cover', width: '100%' }} /> || <VideoLibraryIcon /> }
+                  </a>
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="center">
+                  <a href={front_end_server + '/playlist/' + row.playlist_id} target="_blank">
+                    {row.playlist_title}
+                  </a>
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="center">
                   {row.sender_name}
@@ -290,8 +299,8 @@ export default function CustomPaginationActionsTable() {
                   {row.dateTime}
                 </TableCell>
                 <TableCell style={{ width: 160 }} align="center">
-                  <Button size='sm' style={{ marginRight: 5 }} href={front_end_server + '/playlist/' + row.playlist_id} target='_blank'>Open</Button>
-                  <Button size='sm' variant='danger' onClick={() => handleDelete(row.id)}>Delete</Button>
+                  <Button size='sm' style={{ marginRight: 5 }} href={front_end_server + '/playlist/' + row.playlist_id} target='_blank' block>Open</Button>
+                  <Button size='sm' variant='danger' onClick={() => handleDelete(row.id)} block>Delete</Button>
                 </TableCell>
               </TableRow>
             ))}

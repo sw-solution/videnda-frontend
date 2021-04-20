@@ -42,7 +42,7 @@ const ImageUpload = () => {
     const [currentFile, setCurrentFile] = React.useState(undefined);
     const [previewImage, setPreviewImage] = React.useState(undefined);
     const [progress, setProgress] = React.useState(0);
-    const [message, setMessage] = React.useState("");
+    const [message, setMessage] = React.useState('');
     const [pageNumber, setPageNumber] = React.useState(localStorage.getItem('page') ? Number(localStorage.getItem('page')) : 1);
     const [itemsPerPage] = React.useState(10);
     const [totalPages, setTotalPages] = React.useState(1);
@@ -136,6 +136,8 @@ const ImageUpload = () => {
     }
 
     React.useEffect(() => {
+        setMessage('qwe');
+
         ImageService.getImageFiles()
             .then(async response => {
                 if (response.data && response.data.length > 0) {
@@ -228,7 +230,6 @@ const ImageUpload = () => {
 
             setMessage(resMessage);
             setProgress(0);
-            // setMessage("Could not upload the image!");
             setCurrentFile(undefined);
         })
     }
@@ -462,9 +463,11 @@ const ImageUpload = () => {
                         < ProgressBar className="my-3" min={0} max={100} now={progress} label={`${progress}%`} striped />
                     )}
 
-                    {message && (
-                        <Alert variant="success" className="mt-3 upload_alert" show={alertVisible}>
-                            <Alert.Heading>Upload Completed!</Alert.Heading>
+                    {alertVisible && message && (
+                        <Alert
+                            severity='success'
+                            style={{ position: 'fixed', bottom: 50, right: 50, zIndex: 9999, padding: '20px 40px' }}
+                        >
                             {message}
                         </Alert>
                     )}
@@ -518,14 +521,10 @@ const ImageList = (props) => {
 
             err.response.data.text().then(res => {
                 let eMessage = JSON.parse(res).message
-                if (eMessage === 'Not Enough Tokens.') {
-                    setErrorMessage('Not enough token - please take your tokens');
-                    setTimeout(() => {
-                        setErrorMessage('');
-                    }, 5000);
-                } else {
-                    setErrorMessage(eMessage);
-                }
+                setErrorMessage(eMessage);
+                setTimeout(() => {
+                    setErrorMessage('');
+                }, 5000);
             })
 
         })

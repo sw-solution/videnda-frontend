@@ -12,22 +12,20 @@ import InputIcon from '@material-ui/icons/Create';
 import InsertLink from '@material-ui/icons/InsertLink';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Modal from 'react-bootstrap/Modal';
-import ReactPlayer from 'react-player';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import FolderIcon from '@material-ui/icons/Folder';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import FolderSharedIcon from '@material-ui/icons/FolderShared';
+import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
 import GlobalData from '../../../tools/GlobalData';
-import MultipleSelect from './MutipleSelect';
-import MyVerticallyCenteredModal from './MyVerticallyCenteredModal';
+import SelectOptions from '../../Common/SelectOptions';
+import VideoPlayer from '../Video/VideoPlayer';
 import EditDialog from '../Video/EditDialog';
 
 import {
@@ -43,6 +41,9 @@ import {
 import VideoService from '../../../services/video.service';
 import PlaylistService from '../../../services/playlist.service';
 import { LinearProgress, Paper } from '@material-ui/core';
+import { Fragment } from 'react';
+
+import authService from '../../../services/auth.service';
 
 const front_end_server = GlobalData.front_end_server_ip + ":" + GlobalData.front_end_server_port;
 //const ba-ck_end_server = GlobalData.ba-ck_end_server_ip + ":3000";
@@ -75,7 +76,8 @@ const SettingDialog = (props) => {
 
     return (
         <Modal
-            {...props}
+            show={props.show}
+            onHide={props.onHide}
             size="md"
             aria-labelledby="contained-modal-title-vcenter"
             centered
@@ -86,11 +88,10 @@ const SettingDialog = (props) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Row>
+                <Row className="justify-content-end">
                     <Col md={8}>
                         <TextField
                             className={classes.linkInput}
-                            id="input-with-icon-textfield-top"
                             placeholder="Input a new playlist name to change."
                             value={props.currentPlaylistTitle}
                             onChange={(e) => props.setCurrentPlaylistTitle(e.target.value)}
@@ -105,9 +106,7 @@ const SettingDialog = (props) => {
                     </Col>
                     <Col md={4}>
                         <Select className="mr-4"
-                            style={{ width: "100px" }}
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
+                            style={{ width: "100%" }}
                             value={props.currentPlaylistStatus}
                             onChange={(e) => props.setCurrentPlaylistStatus(e.target.value)}
                         >
@@ -115,6 +114,37 @@ const SettingDialog = (props) => {
                             <MenuItem value={0}>Private</MenuItem>
                         </Select>
                     </Col>
+
+                    <Col md={12}>
+                        <Select className="mr-4 mt-4"
+                            style={{ width: "100%" }}
+                            value={props.currentPlaylistThumbVideo}
+                            onChange={(e) => props.setCurrentPlaylistThumbVideo(e.target.value)}
+                        >
+                            <MenuItem value="0" disabled> Choose a video for thumbnail </MenuItem>
+                            { props.videoInfos.map((item, index) => {
+                                return (
+                                    <MenuItem key={index} value={item.id}> { item.manual_title || item.meta_title } </MenuItem>
+                                )}
+                            )}
+                        </Select>
+                    </Col>
+                    
+                    {props.isAdmin &&
+                        <Col md={6}>
+                            <Select
+                                className="mr-4 mt-4"
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={props.currentPlaylistType}
+                                onChange={(e) => props.setCurrentPlaylistType(e.target.value)}
+                                fullWidth
+                            >
+                                <MenuItem value='standard'>Standard</MenuItem>
+                                <MenuItem value='marketing'>Marketing</MenuItem>
+                            </Select>
+                        </Col>
+                    }
                 </Row>
             </Modal.Body>
             <Modal.Footer>
@@ -149,13 +179,19 @@ export default () => {
     const [playlistData, setPlaylistData] = useState([]);
     const [currentPlaylistTitle, setCurrentPlaylistTitle] = useState('');
     const [currentPlaylistStatus, setCurrentPlaylistStatus] = useState('');
+    const [currentPlaylistThumbVideo, setCurrentPlaylistThumbVideo] = useState(0);
+    const [currentPlaylistType, setCurrentPlaylistType] = useState(0);
+    
     const [playlists, setPlaylists] = useState([]);
     const [videoId, setVideoId] = useState(null);
-    const [playlistId, setPlaylistId] = useState(null);
+    // const [playlistId, setPlaylistId] = useState(null);
     const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
     const [editShow, setEditShow] = useState(false);
     const [manualTitle, setManualTitle] = useState(undefined);
     const [manualDescription, setManualDescription] = useState(undefined);
+
+    const user = authService.getCurrentUser();
+    const isAdmin = user && user.roles.includes("ROLE_ADMIN") || false
 
     React.useEffect(() => {
         getAllPlaylists();
@@ -167,7 +203,7 @@ export default () => {
                 if (response.data && response.data.length > 0) {
                     setPlaylistData(response.data);
                     setPlaylists(response.data);
-                    handleItemClick(response.data[0].playlist_id, response.data[0].playlist_title, response.data[0].playlist_status)
+                    handleItemClick(response.data[0])
                 }
             })
     }
@@ -265,12 +301,14 @@ export default () => {
         window.location.reload();
     }
 
-    const handleItemClick = (playlist_id, playlist_title, playlist_status) => {
-        setCurrentPlaylistId(playlist_id);
-        setCurrentPlaylistTitle(playlist_title);
-        setCurrentPlaylistStatus(playlist_status);
+    const handleItemClick = (item ) => {
+        setCurrentPlaylistId(item.playlist_id);
+        setCurrentPlaylistTitle(item.playlist_title);
+        setCurrentPlaylistStatus(item.playlist_status);
+        setCurrentPlaylistThumbVideo(item.thumb_video);
+        setCurrentPlaylistType(item.type);
 
-        PlaylistService.getPlaylist(playlist_id)
+        PlaylistService.getPlaylist(item.playlist_id)
             .then(async response => {
                 if (response.data && response.data.length > 0) {
 
@@ -312,13 +350,14 @@ export default () => {
     // change
     const handleSettingSave = () => {
         setSettingShow(false)
-        PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus)
+        PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus, currentPlaylistThumbVideo, currentPlaylistType)
             .then(response => {
                 if (response.data.message === 'success') {
                     getAllPlaylists();
                     setCurrentPlaylistId('');
                     setCurrentPlaylistTitle('');
                     setCurrentPlaylistStatus('');
+                    setCurrentPlaylistThumbVideo(0);
                 }
             })
     }
@@ -384,6 +423,19 @@ export default () => {
         videoData[index].manual_description = manualDescription;
     }
 
+    const setVideoType = (video_id, type) => {
+        let arr = videoInfos;
+        arr.map((item, index) => {
+            item.id == video_id && (arr[index].type = type);
+        });
+        setVideoInfos(arr);
+
+        VideoService.setVideoType(video_id, type);
+    }
+
+    const savePlaylist = (id, value) => {
+        VideoService.addPlaylistIds(id, value)
+    }
 
     const classes = useStyles();
 
@@ -396,7 +448,7 @@ export default () => {
     }
 
     return (
-        <>
+        <Fragment>
             <h2 className="mb-3">My Playlists</h2>
             <Row className="mb-3">
                 <Col md={4}>
@@ -427,6 +479,7 @@ export default () => {
                         <MenuItem value={1}>Public</MenuItem>
                         <MenuItem value={0}>Private</MenuItem>
                     </Select>
+
                     <Button disabled={playlistTitle === ''} onClick={upload}>
                         Add Playlist
                     </Button>
@@ -456,11 +509,11 @@ export default () => {
                                 return (
                                     <ListItem button key={item.id}
                                         selected={currentPlaylistId == item.playlist_id}
-                                        onClick={() => handleItemClick(item.playlist_id, item.playlist_title, item.playlist_status)}
+                                        onClick={() => handleItemClick(item)}
                                     >
                                         <ListItemAvatar>
                                             <Avatar>
-                                                {item.playlist_status == 1 ? <FolderIcon /> : <FolderSharedIcon />}
+                                                {item.thumb_image && <Image roundedCircle src={ item.thumb_image } style={{ objectFit: 'cover', width: 40, height: 40 }} /> || <VideoLibraryIcon/> }
                                             </Avatar>
                                         </ListItemAvatar>
                                         <ListItemText primary={item.playlist_title} />
@@ -494,11 +547,13 @@ export default () => {
                             setManualTitle={setManualTitle}
                             setManualDescription={setManualDescription}
                             setVideoId={setVideoId}
+                            savePlaylist={savePlaylist}
+                            setVideoType={setVideoType}
                         />
                     }
                 </Col>
             </Row>
-            <MyVerticallyCenteredModal
+            <VideoPlayer
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
@@ -518,9 +573,15 @@ export default () => {
                 onDelete={handleSettingShow}
                 onSave={handleSettingSave}
                 setCurrentPlaylistTitle={setCurrentPlaylistTitle}
-                setCurrentPlaylistStatus={setCurrentPlaylistStatus}
                 currentPlaylistTitle={currentPlaylistTitle}
                 currentPlaylistStatus={currentPlaylistStatus}
+                setCurrentPlaylistStatus={setCurrentPlaylistStatus}
+                setCurrentPlaylistThumbVideo={setCurrentPlaylistThumbVideo}
+                currentPlaylistThumbVideo={currentPlaylistThumbVideo}
+                setCurrentPlaylistType={setCurrentPlaylistType}
+                currentPlaylistType={currentPlaylistType}
+                videoInfos={videoInfos}
+                isAdmin={isAdmin}
             />
             <EditDialog
                 show={editShow}
@@ -531,13 +592,21 @@ export default () => {
                 setManualDescription={setManualDescription}
                 onSave={onSave}
             />
-        </>
+        </Fragment>
     );
 }
 
 
 const VideoList = (props) => {
     const classes = useStyles();
+
+    let playlists = [];
+    props.playlists.map(item=>{
+        playlists.push({id: item.id, name: item.playlist_title});
+    });
+    
+    const user = authService.getCurrentUser();
+    const isAdmin = user && user.roles.includes("ROLE_ADMIN") || false
 
     const renderItem = (data) => (
         <ListGroup.Item key={data.id}>
@@ -555,7 +624,7 @@ const VideoList = (props) => {
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
 
                     <Row>
-                        <Col>
+                        <Col className="align-self-end pb-4">
                             <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.manual_description || data.meta_description, data.id)}>Play</Button>
                             <Button variant="info" size="sm" className="mr-2"
                                 onClick={() => {
@@ -571,14 +640,28 @@ const VideoList = (props) => {
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&
-                                <MultipleSelect names={props.playlists} videoId={data.id} a={data.arr} />
+                                <SelectOptions
+                                    label='Playlists'
+                                    id={data.id}
+                                    value={data.arr}
+                                    items={playlists}
+                                    onSave={props.savePlaylist}
+                                    multiple={true}
+                                />
                             }
-                            {/* <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
-                                <option value="">Non Playlist</option>
-                                {props.playlists.map((item) => {
-                                    return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
-                                })}
-                            </select> */}
+                            { isAdmin && 
+                                <SelectOptions
+                                    label='Type'
+                                    id={data.id}
+                                    value={data.type}
+                                    items={[
+                                        {id: 'free', name: 'Free'},
+                                        {id: 'pro', name: 'Pro'}
+                                        ]}
+                                    onSave={props.setVideoType}
+                                    multiple={false}
+                                />
+                            }
                         </Col>
                     </Row>
                 </Media.Body>

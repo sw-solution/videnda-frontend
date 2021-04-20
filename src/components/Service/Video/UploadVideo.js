@@ -9,7 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InputIcon from '@material-ui/icons/InsertLink';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import MyVerticallyCenteredModal from '../Playlist/MyVerticallyCenteredModal';
+import VideoPlayer from './VideoPlayer';
 import EditDialog from './EditDialog';
 
 import {
@@ -25,8 +25,9 @@ import {
 
 import PlaylistService from '../../../services/playlist.service';
 import VideoService from '../../../services/video.service';
-import { Collapse, LinearProgress } from '@material-ui/core';
-import MultipleSelect from './MutipleSelect';
+import { LinearProgress } from '@material-ui/core';
+import SelectOptions from '../../Common/SelectOptions';
+import authService from '../../../services/auth.service';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -74,6 +75,7 @@ const VideoUpload = () => {
     const [editShow, setEditShow] = useState(false);
     const [manualTitle, setManualTitle] = useState(undefined);
     const [manualDescription, setManualDescription] = useState(undefined);
+    //const [myPlayingStatus, setMyPlayingStatus] = useState(false);
 
     useEffect(() => {
         setExpand()
@@ -457,6 +459,7 @@ const VideoUpload = () => {
 
     // Play one video
     const handlePlayVideo = (video_url, meta_title, videoId, meta_restriction_age, meta_description) => {
+        //setMyPlayingStatus(true);
         setModalShow(true);
         setPlayUrl(video_url);
         setMetaTitle(meta_title);
@@ -536,6 +539,20 @@ const VideoUpload = () => {
         videoData[index].manual_description = manualDescription;
     }
 
+    const setVideoType = (video_id, type) => {
+        let arr = videoInfos;
+        arr.map((item, index) => {
+            item.id == video_id && (arr[index].type = type);
+        });
+        setVideoInfos(arr);
+
+        VideoService.setVideoType(video_id, type);
+    }
+
+    const savePlaylist = (id, value) => {
+        VideoService.addPlaylistIds(id, value)
+    }
+
     const classes = useStyles();
 
     const renderTree = (nodes) => {
@@ -603,6 +620,7 @@ const VideoUpload = () => {
                             itemsPerPage={itemsPerPage}
                             currentPage={pageNumber}
                             playlists={playlists}
+                            savePlaylist={savePlaylist}
                             onChangeKeyword={handleChangeKeyword}
                             onChangePageNumber={handleChangePageNumber}
                             handleRemoveItem={handleRemoveItem}
@@ -612,11 +630,12 @@ const VideoUpload = () => {
                             setManualTitle={setManualTitle}
                             setManualDescription={setManualDescription}
                             setVideoId={setVideoId}
+                            setVideoType={setVideoType}
                         />
                     }
                 </Col>
             </Row>
-            <MyVerticallyCenteredModal
+            <VideoPlayer
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
@@ -629,6 +648,7 @@ const VideoUpload = () => {
                 onOpenSourceUrl={onOpenSourceUrl}
                 currentVideoNumber={currentVideoNumber}
                 itemClick={itemClick}
+                //myPlayingStatus={true}
             />
             <EditDialog
                 show={editShow}
@@ -647,6 +667,14 @@ const VideoUpload = () => {
 const VideoList = (props) => {
     const classes = useStyles();
 
+    let playlists = [];
+    props.playlists.map(item=>{
+        playlists.push({id: item.id, name: item.playlist_title});
+    });
+
+    const user = authService.getCurrentUser();
+    const isAdmin = user && user.roles.includes("ROLE_ADMIN") || false
+
     const renderItem = (data) => (
         <ListGroup.Item key={data.id}>
             <Media>
@@ -663,14 +691,18 @@ const VideoList = (props) => {
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
 
                     <Row>
-                        <Col>
-                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)}>Play</Button>
+                        <Col className="align-self-end pb-4">
+                            <Button variant="success" size="sm" className="mr-2"
+                            	onClick={() => props.handlePlayVideo(data.video_id, data.manual_title ||
+                            		data.meta_title, data.id, data.meta_restriction_age,
+                            		data.manual_description || data.meta_description)}>Play</Button>
                             <Button variant="info" size="sm" className="mr-2"
                                 onClick={() => {
-                                    props.setManualTitle(data.manual_title ? data.manual_title : data.meta_title);
-                                    props.setManualDescription(data.manual_description ? data.manual_description : data.meta_description);
-                                    props.setEditShow(true);
-                                    props.setVideoId(data.id);
+                                    props.setManualTitle( data.manual_title ? data.manual_title : data.meta_title);
+                                    props.setManualDescription(
+										data.manual_description ? data.manual_description : data.meta_description);
+                                    props.setEditShow( true);
+                                    props.setVideoId(  data.id);
                                 }}
                             >
                                 Edit
@@ -679,19 +711,30 @@ const VideoList = (props) => {
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&
-                                <MultipleSelect names={props.playlists} videoId={data.id} a={data.arr} />
+                                <SelectOptions
+                                    label='Playlists'
+                                    id={data.id}
+                                    value={data.arr}
+                                    items={playlists}
+                                    onSave={props.savePlaylist}
+                                    multiple={true}
+                                />
                             }
-                            {/* <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
-                                <option value="">Non Playlist</option>
-                                {props.playlists.map((item) => {
-                                    return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
-                                })}
-                            </select> */}
+                            { isAdmin &&
+                                <SelectOptions
+                                    label='Type'
+                                    id={data.id}
+                                    value={data.type}
+                                    items={[
+                                        {id: 'free', name: 'Free'},
+                                        {id: 'pro', name: 'Pro'}
+                                        ]}
+                                    onSave={props.setVideoType}
+                                    multiple={false}
+                                />
+                            }
                         </Col>
                     </Row>
-
-
-
                 </Media.Body>
             </Media>
         </ListGroup.Item>

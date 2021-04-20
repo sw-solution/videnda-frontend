@@ -6,24 +6,42 @@ import TextField from '@material-ui/core/TextField';
 import InsertEmoticon from '@material-ui/icons/InsertEmoticon';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
+import { useHistory } from "react-router-dom";
+
+
 import {
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
 
+
 const AddTokenCode = () => {
+  console.log( "AddTokenCode START");
   const [currentUser, setCurrentUser] = React.useState(undefined);
   const [message, setMessage] = React.useState('');
   const [tokenCode, setTokenCode] = React.useState('');
+  const history = useHistory();
 
+  console.log( "AddTokenCode get profile");
   React.useEffect(()=>{
-    AuthService.getUserProfile().then((response)=>{
-      setCurrentUser(response);
-    });
+    AuthService.getUserProfile()
+    	.then((response)=>{
+		  setCurrentUser(response);
+    	})
+    	.catch((err) => {
+			const err_str = err.toString();
+            const resMessage = "Please Login [" + err_str + "]";
+            setMessage(resMessage);
+            if( err_str.includes( "403"))
+            	history.push('/signin');
+            //setTimeout(() => {
+            //  setMessage('');
+            //}, 3000);
+        });
   }, [])
 
-
+  console.log( "AddTokenCode add tokens");
   const handleAddTokens = (e) => {
     if (e.key === 'Enter' || e.keyCode === 13 || e.target.innerText == 'Add Tokens') {
       UserService.addTokenCode(tokenCode)

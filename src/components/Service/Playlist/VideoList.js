@@ -3,13 +3,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable eqeqeq */
 import React, { useEffect, useState } from 'react';
+import {
+    useParams
+  } from "react-router-dom";
+
 import { makeStyles } from '@material-ui/core/styles';
 import { Pagination } from '@material-ui/lab';
 import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { useHistory } from "react-router-dom";
-import MyVerticallyCenteredModal from './MyVerticallyCenteredModal';
+import VideoPlayer from '../Video/VideoPlayer';
 import Alert from '@material-ui/lab/Alert';
 import MButton from '@material-ui/core/Button';
 
@@ -56,7 +60,6 @@ export default (props) => {
     const [playUrl, setPlayUrl] = useState(null);
     const [metaTitle, setMetaTitle] = useState(null);
     const [videoId, setVideoId] = useState(null);
-    const [playlistId, setPlaylistId] = useState(null);
     const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
     const [metaDescription, setMetaDescription] = useState(null);
     const [errorText, setErrorText] = useState('');
@@ -64,23 +67,17 @@ export default (props) => {
 
     let history = useHistory();
 
+    let params = useParams();
+    let playlistId = params.playlist_id || history.push("/404");
+
     useEffect(() => {
-        setPlaylistId(props.match.params.playlist_id);
-        if (localStorage.getItem("user")) {
-            getAllVideos();
-        } else {
-            history.push("/signin");
-        }
+        getAllVideos();
     }, [props])
 
     const getAllVideos = () => {
         if (playlistId != null)
             PlaylistService.getPublicPlaylist(playlistId)
                 .then(async response => {
-                    console.log("response.data.length=" + response.data.length)
-                    if (response.data.message == 'cannot_access' || response.data.length == 0) {
-                        history.push("/404");
-                    }
                     if (response.data && response.data.length > 0) {
 
                         setVideoData(response.data)
@@ -89,6 +86,13 @@ export default (props) => {
                         const total = Math.ceil(response.data.length / itemsPerPage);
                         setTotalPages(total);
                     }
+                }).catch(error => {
+                    console.log(error.response)
+
+                    if ( error.response.status == 401 )
+                        history.push("/signin");
+                    else if ( error.response.status == 403 || error.response.status == 404 )
+                        history.push("/404");
                 })
     }
 
@@ -145,12 +149,10 @@ export default (props) => {
                     err.response.data.message
                 ) || err.toString();
 
-                if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage);
-                    setTimeout(() => {
-                        setErrorText('');
-                    }, 5000);
-                }
+                setErrorText(resMessage);
+                setTimeout(() => {
+                    setErrorText('');
+                }, 5000);
             });
     }
 
@@ -176,12 +178,10 @@ export default (props) => {
                     err.response.data.message
                 ) || err.toString();
 
-                if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage);
-                    setTimeout(() => {
-                        setErrorText('');
-                    }, 5000);
-                }
+                setErrorText(resMessage);
+                setTimeout(() => {
+                    setErrorText('');
+                }, 5000);
             });
     }
 
@@ -207,12 +207,10 @@ export default (props) => {
                     err.response.data.message
                 ) || err.toString();
 
-                if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage);
-                    setTimeout(() => {
-                        setErrorText('');
-                    }, 5000);
-                }
+                setErrorText(resMessage);
+                setTimeout(() => {
+                    setErrorText('');
+                }, 5000);
             });
     }
 
@@ -249,12 +247,10 @@ export default (props) => {
                     err.response.data.message
                 ) || err.toString();
 
-                if (err.response.data.message == 'Not Enough Tokens') {
-                    setErrorText(resMessage);
-                    setTimeout(() => {
-                        setErrorText('');
-                    }, 5000);
-                }
+                setErrorText(resMessage);
+                setTimeout(() => {
+                    setErrorText('');
+                }, 5000);
             });
     }
 
@@ -271,7 +267,7 @@ export default (props) => {
                     handlePlayVideo={handlePlayVideo}
                 />
             }
-            <MyVerticallyCenteredModal
+            <VideoPlayer
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
@@ -285,19 +281,22 @@ export default (props) => {
                 currentVideoNumber={currentVideoNumber}
                 itemClick={itemClick}
             />
-            {errorText &&
+            {errorText && //errorText.includes('Token')
                 <div>
                     <Alert
                         severity='error'
                         style={{ position: 'fixed', bottom: 50, right: 50, zIndex: 9999, padding: '20px 40px' }}
                         action={
+								(errorText.includes('Not Enough Tokens') ||
+									errorText.includes('Please login'))
+                            &&
                             <MButton
                                 color="inherit" size="medium"
                                 onClick={() => {
                                     history.push('/add_token_code');
                                 }}
                             >
-                                Take More Tokens
+                                Take More Tokens (+)
                         </MButton>
                         }
                     >

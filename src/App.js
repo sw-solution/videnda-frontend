@@ -21,6 +21,7 @@ import BoardUser from "./components/User/BoardUser";
 import BoardModerator from "./components/User/BoardModerator";
 import BoardAdmin from "./components/User/BoardAdmin";
 import TokenManagement from "./components/User/Admin/TokenManagement";
+import CategoryManagement from "./components/User/Admin/CategoryManagement";
 import ExecuteService from "./components/Service/ExecuteService";
 import NoMatch from './components/NoMatch';
 
@@ -36,10 +37,8 @@ import UploadVideo from './components/Service/Video/UploadVideo'
 import Playlist from './components/Service/Playlist/Playlist'
 import ReceivedPlaylist from './components/Service/ReceivedPlaylist/ReceivedPlaylist';
 import VideoList from './components/Service/Playlist/VideoList'
-
-// tokens
 import AddTokenCode from './components/User/AddTokenCode';
-
+import CategoryPlaylists from './components/User/CategoryPlaylists';
 
 function App() {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -49,7 +48,6 @@ function App() {
   useEffect(() => {
     const user = authService.getCurrentUser();
     if (user) {
-      console.log(user)
       setCurrentUser(user);
       setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
       setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
@@ -83,6 +81,7 @@ function App() {
               {showAdminBoard && (
                 <NavDropdown title='Admin Menu' id="collasible-nav-dropdown" alignRight >
                   <NavDropdown.Item href="/token_management">Token Management</NavDropdown.Item>
+                  <NavDropdown.Item href="/admin/categories">Category Management</NavDropdown.Item>
                 </NavDropdown>
               )}
               <NavDropdown title='Services' id="collasible-nav-dropdown" alignRight >
@@ -128,13 +127,15 @@ function App() {
           <Route path="/manage_ppt/list" component={PPTFileList} />
           <Route path="/manage_ppt/edit_ppt/:ppt_id" component={EditPPT} />
           <Route path="/upload_video" component={UploadVideo} />
-          <Route path="/playlists" component={Playlist} />0
+          <Route path="/playlists" component={Playlist} />
           <Route path="/playlist/:playlist_id" component={VideoList} />
           <Route path="/received_playlist" component={ReceivedPlaylist} />
           <Route path="/user" component={BoardUser} />
           <Route path="/mod" component={BoardModerator} />
+          <Route path="/admin/categories" component={CategoryManagement} />
           <Route path="/admin" component={BoardAdmin} />
           <Route path="/add_token_code" component={AddTokenCode} />
+          <Route path="/category_playlists/:category_id" component={CategoryPlaylists} />
           <Route path="*" component={NoMatch} />
         </Switch>
       </div>

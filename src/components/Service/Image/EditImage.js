@@ -46,7 +46,8 @@ const MyVerticallyCenteredModal = (props) => {
 
     return (
         <Modal
-            {...props}
+            show={props.show}
+            onHide={props.onHide}
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
@@ -156,14 +157,11 @@ const EditImage = (props) => {
                 err.response.data.message
             ) || err.toString();
             setIsLoading(false);
-            if (err.response.data.message === 'Not Enough Tokens') {
-                setErrorMessage('Not enough token - please take your tokens');
-                setTimeout(() => {
-                    setErrorMessage('');
-                }, 5000);
-            } else {
-                setErrorMessage(resMessage);
-            }
+            
+            setErrorMessage(resMessage);
+            setTimeout(() => {
+                setErrorMessage('');
+            }, 5000);
         });
         setIsRotate(true);
     }
@@ -192,14 +190,11 @@ const EditImage = (props) => {
                 err.response.data.message
             ) || err.toString();
             setIsLoading(false);
-            if (err.response.data.message === 'Not Enough Tokens') {
-                setErrorMessage('Not enough token - please take your tokens');
-                setTimeout(() => {
-                    setErrorMessage('');
-                }, 5000);
-            } else {
-                setErrorMessage(resMessage);
-            }
+
+            setErrorMessage(resMessage);
+            setTimeout(() => {
+                setErrorMessage('');
+            }, 5000);
         })
     }
 
@@ -319,14 +314,10 @@ const EditImage = (props) => {
             setIsLoading(false);
             err.response.data.text().then(res => {
                 let eMessage = JSON.parse(res).message
-                if (eMessage === 'Not Enough Tokens.') {
-                    setErrorMessage('Not enough token - please take your tokens');
-                    setTimeout(() => {
-                        setErrorMessage('');
-                    }, 5000);
-                } else {
-                    setErrorMessage(eMessage);
-                }
+                setErrorMessage(eMessage);
+                setTimeout(() => {
+                    setErrorMessage('');
+                }, 5000);
             })
         })
     }
@@ -403,12 +394,13 @@ const EditImage = (props) => {
                     <Pagination color="primary" shape="rounded" className="m-3" count={totalPage} page={pageNumber} onChange={(event, val) => setPageNumber(val)} />
                 </div>
             </div>
-            {errorMessage && (
+            {
+                errorMessage &&
                 <div>
                     <Alert
                         severity='error'
                         style={{ position: 'fixed', bottom: 50, right: 50, zIndex: 9999, padding: '20px 40px' }}
-                        action={
+                        action={ errorMessage.includes('Not Enough Tokens') &&
                             <MButton
                                 color="inherit" size="medium"
                                 onClick={() => {
@@ -422,7 +414,7 @@ const EditImage = (props) => {
                         {errorMessage}
                     </Alert>
                 </div>
-            )}
+            }
         </div>
     )
 }

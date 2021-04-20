@@ -15,7 +15,11 @@ class PlaylistService {
 
   addHistory(video_id) {
     const currentUser = Auth.getCurrentUser();
-    return axios.post(`${PLAYLIST_API_URL}addHistory?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`);
+    if( currentUser ) {
+      return axios.post(`${PLAYLIST_API_URL}addHistory?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`);
+    } else {
+      return axios.post(`${PLAYLIST_API_URL}addHistory?video_id=${video_id}`);
+    }
   }
 
 
@@ -24,9 +28,9 @@ class PlaylistService {
     return axios.post(`${PLAYLIST_API_URL}removePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
   }
 
-  changePlaylist(id, currentPlaylistTitle, currentPlaylistStatus) {
+  changePlaylist(id, currentPlaylistTitle, currentPlaylistStatus, thumb_video, type) {
     const currentUser = Auth.getCurrentUser();
-    return axios.post(`${PLAYLIST_API_URL}changePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&currentPlaylistTitle=${currentPlaylistTitle}&currentPlaylistStatus=${currentPlaylistStatus}`);
+    return axios.post(`${PLAYLIST_API_URL}changePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&currentPlaylistTitle=${currentPlaylistTitle}&currentPlaylistStatus=${currentPlaylistStatus}&thumb_video=${thumb_video}&type=${type}`);
   }
 
   getAllPlaylist() {
@@ -41,10 +45,7 @@ class PlaylistService {
 
   getPublicPlaylist(playlist_id) {
     const currentUser = Auth.getCurrentUser();
-    if (!currentUser) {
-      return null;
-    }
-    return axios.get(`${PLAYLIST_API_URL}getPublicPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
+    return axios.get(`${PLAYLIST_API_URL}getPublicPlaylist?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
   }
 }
 

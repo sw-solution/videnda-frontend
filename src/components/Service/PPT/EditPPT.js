@@ -6,6 +6,9 @@ import MButton from '@material-ui/core/Button';
 import { useHistory } from "react-router-dom";
 import downloadFile from '../../../services/downloadfile'
 
+import {
+    Button,
+} from 'react-bootstrap';
 
 import GlobalData from '../../../tools/GlobalData';
 import pptService from '../../../services/ppt.service';
@@ -64,14 +67,10 @@ const EditPPT = (props) => {
                 err.response.data.message
             ) || err.toString();
             setIsLoading(false);
-            if (resMessage === 'Not Enough Tokens') {
-                setErrorMessage('Not enough token - please take your tokens');
-                setTimeout(() => {
-                    setErrorMessage('');
-                }, 5000);
-            } else {
-                setErrorMessage(resMessage);
-            }
+            setErrorMessage(resMessage);
+            setTimeout(() => {
+                setErrorMessage('');
+            }, 5000);
         });
     }
 
@@ -88,14 +87,10 @@ const EditPPT = (props) => {
             setIsLoading(false);
             err.response.data.text().then(res => {
                 let eMessage = JSON.parse(res).message
-                if (eMessage === 'Not Enough Tokens.') {
-                    setErrorMessage('Not enough token - please take your tokens');
-                    setTimeout(() => {
-                        setErrorMessage('');
-                    }, 5000);
-                } else {
-                    setErrorMessage(eMessage);
-                }
+                setErrorMessage(eMessage);
+                setTimeout(() => {
+                    setErrorMessage('');
+                }, 5000);
             })
         })
     }
@@ -127,14 +122,19 @@ const EditPPT = (props) => {
             )}
             <div className="justify-content-center">
                 <div className="float-lg-left float-md-left" style={{ width: "500px" }}>
-                    <button className="btn btn-primary mx-2" onClick={() => { handleAddNewSlide() }} disabled={lastId !== pptId || isLoading}>
-                        {isLoading && (
-                            <span className="spinner-border spinner-border-sm"></span>
-                        )}
-                        <span>Add New Slide</span>
-                    </button>
-                    <button className="btn btn-primary" onClick={() => handlePptDownload(`${back_end_server}/api/ppt/getPPTFile/${pptId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=download`, fileName)}
-                    >Download</button>
+                    <div className="mb-3">
+                        <Button className="btn-circles mr-1" href='/manage_ppt/list'>
+                            Go Back
+                        </Button>
+                        <button className="btn btn-primary mx-2" onClick={() => { handleAddNewSlide() }} disabled={lastId !== pptId || isLoading}>
+                            {isLoading && (
+                                <span className="spinner-border spinner-border-sm"></span>
+                            )}
+                            <span>Add New Slide</span>
+                        </button>
+                        <button className="btn btn-primary" onClick={() => handlePptDownload(`${back_end_server}/api/ppt/getPPTFile/${pptId}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&type=download`, fileName)}
+                        >Download</button>
+                    </div>
                     <PPTHistory pptHistory={pptHistory} activePPTId={pptId} itemClick={onClickHistory} />
                 </div>
             </div>
