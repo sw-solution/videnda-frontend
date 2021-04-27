@@ -146,7 +146,16 @@ function App() {
           <Route path="*" component={NoMatch} />
         </Switch>
       </div>
+      <Navbar className="fixed-bottom" bg="dark" variant="dark" sticky="bottom">  
+        <div className="container text-center">
+            <div className="col-sm-12">
+
+                <p className="text-center twhite m-2"> Licence Terms Licence Terms link || Copyright © 2021 Videnda AI</p>
+            </div>
+        </div>
+      </Navbar>
     </Router>
+    
   )
 }
 
