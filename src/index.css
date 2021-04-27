@@ -36,12 +36,12 @@ code {
 
 .masonryMedia .media-body {
   display: none;
-  
   height: 100%;
   width: 100%;
   position: absolute;
   right: 0;
   top: 0;
+  padding: 15px;
 }
 .masonryMedia .media-body h2, .masonryMedia .media-body p{
   color:#fff;
@@ -54,8 +54,10 @@ code {
   width: 100%;
 }
  .twhite{color:#fff}
+ a.twhite{color:rgb(179, 179, 179)}
+ a.twhite:hover{color:#fff}
  
  .masonryMedia .media-body button {
-  display: flex;
-  margin: 8px auto!important;    
+  /* display: flex;
+  margin: 8px auto!important;     */
 }

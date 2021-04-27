@@ -47,7 +47,7 @@ const Home = ()=>{
     let history = useHistory();
             return (
             <ResponsiveMasonry
-                columnsCountBreakPoints={{350: 1, 750: 2, 900: 3}}
+                columnsCountBreakPoints={{350: 1, 750: 2, 900: 2}}
             >
                 <Masonry>
 
@@ -61,20 +61,22 @@ const Home = ()=>{
                                         <div>
                                         <h2><span>{data.title}</span></h2>
                                         <p style={{ marginBottom: "10px" }}><span>{data.description}</span></p>
-                                        { data.public_playlists && data.public_playlists.length > 0 && 
-                                            <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
-                                                className=""
-                                                onClick={ () => { let playlist = data.playlists.filter(item => item.id == data.public_playlists[0])[0]; console.log(playlist); history.push('/playlist/' + playlist.playlist_id) } }>
-                                                Public Playlists
-                                            </Button>
-                                        }
-                                        { data.private_playlists && data.private_playlists.length > 0 &&
-                                            <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
-                                                className=""
-                                                onClick={ () => { history.push('/category_playlists/' + data.category_id) } }>
-                                                Private Playlists
-                                            </Button>
-                                        }
+                                        <div className="d-flex justify-content-center bd-highlight mb-3">
+                                            { data.public_playlists && data.public_playlists.length > 0 && 
+                                                <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
+                                                    className="mr-2"
+                                                    onClick={ () => { let playlist = data.playlists.filter(item => item.id == data.public_playlists[0])[0]; console.log(playlist); history.push('/playlist/' + playlist.playlist_id) } }>
+                                                    Public Playlists
+                                                </Button>
+                                            }
+                                            { data.private_playlists && data.private_playlists.length > 0 &&
+                                                <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
+                                                    className=""
+                                                    onClick={ () => { history.push('/category_playlists/' + data.category_id) } }>
+                                                    Private Playlists
+                                                </Button>
+                                            }
+                                        </div>
                                         </div>
                                     </Media.Body>
                                     </Media>  
