@@ -41,7 +41,7 @@ import VideoList from './components/Service/Playlist/VideoList'
 import AddTokenCode from './components/User/AddTokenCode';
 import CategoryPlaylists from './components/User/CategoryPlaylists';
 
-import MyMasonic from './components/testmasonic'
+
 
 function App() {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -70,7 +70,6 @@ function App() {
           <Nav className="mr-auto">
             <Nav.Link href="/home">Home</Nav.Link>
             <Nav.Link href="/home-back">Home BK</Nav.Link>
-            <Nav.Link href="/masonic">Masonic</Nav.Link>
             {showModeratorBoard && (
               <Nav.Link href="/mod">Moderator Board</Nav.Link>
             )}
@@ -118,7 +117,6 @@ function App() {
         <Switch>
           <Route exact path={["/", "/home"]} component={Home}></Route>
           <Route exact path="/home-back" component={HomeBK}></Route>
-          <Route exact path="/masonic" component={MyMasonic}></Route>
           <Route path="/signin" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/changePassword" component={ChangePassword} />
@@ -150,7 +148,7 @@ function App() {
         <div className="container text-center">
             <div className="col-sm-12">
 
-                <p className="text-center twhite m-2"> Licence Terms Licence Terms link || Copyright © 2021 Videnda AI</p>
+                <p className="text-center twhite m-2"> <a href="#" className="twhite"> Licence Terms</a> || Copyright © 2021 Videnda AI</p>
             </div>
         </div>
       </Navbar>
