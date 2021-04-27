@@ -65,14 +65,14 @@ const Home = ()=>{
                                             <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
                                                 className=""
                                                 onClick={ () => { let playlist = data.playlists.filter(item => item.id == data.public_playlists[0])[0]; console.log(playlist); history.push('/playlist/' + playlist.playlist_id) } }>
-                                                Open Public Playlists
+                                                Public Playlists
                                             </Button>
                                         }
                                         { data.private_playlists && data.private_playlists.length > 0 &&
                                             <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
                                                 className=""
                                                 onClick={ () => { history.push('/category_playlists/' + data.category_id) } }>
-                                                Open Private Playlists
+                                                Private Playlists
                                             </Button>
                                         }
                                         </div>
