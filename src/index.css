@@ -13,15 +13,12 @@ code {
 }
 
 
-body {
-  margin: 0;
-  padding: 1rem;
-}
+
 
 .masonryMedia.media{ overflow: hidden;
   position: relative;
   width: 100%;  
-  background: #ddd;
+  background: #000;
 }
 .masonryMedia.media img{
   max-width: 100%;
@@ -31,7 +28,7 @@ body {
 }
 
 .masonryMedia.media:hover img {
-  opacity: .7;
+  opacity: .6;
   -moz-transform: scale(1.1);
 	-webkit-transform: scale(1.1);
 	transform: scale(1.1);
@@ -46,10 +43,19 @@ body {
   right: 0;
   top: 0;
 }
-
+.masonryMedia .media-body h2, .masonryMedia .media-body p{
+  color:#fff;
+  text-align: center;
+}
 .masonryMedia.media:hover .media-body {
   display: flex;
 }
 .img100{
   width: 100%;
+}
+ .twhite{color:#fff}
+ 
+ .masonryMedia .media-body button {
+  display: flex;
+  margin: 8px auto!important;    
 }
