@@ -11,3 +11,45 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+body {
+  margin: 0;
+  padding: 1rem;
+}
+
+.masonryMedia.media{ overflow: hidden;
+  position: relative;
+  width: 100%;  
+  background: #ddd;
+}
+.masonryMedia.media img{
+  max-width: 100%;
+	-moz-transition: all 0.3s;
+	-webkit-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+.masonryMedia.media:hover img {
+  opacity: .7;
+  -moz-transform: scale(1.1);
+	-webkit-transform: scale(1.1);
+	transform: scale(1.1);
+}
+
+.masonryMedia .media-body {
+  display: none;
+  
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.masonryMedia.media:hover .media-body {
+  display: flex;
+}
+.img100{
+  width: 100%;
+}
