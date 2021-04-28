@@ -68,7 +68,7 @@ const Home = ()=>{
                     {categories
                         && categories.map((data, i) => {
                                 return(
-                                    <div className="m-1">
+                                    <div className="m-0">
                                     <Media className="masonryMedia">
                                   <img  src={data.thumb_image} className="img100" style={{ cursor: 'pointer' }}                                  />
                                   <Media.Body class="media-body justify-content-center align-items-center">

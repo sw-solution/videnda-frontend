@@ -20,7 +20,7 @@ code {
   width: 100%;  
   background: #000;
 }
-.masonryMedia.media img{
+.masonryMedia.media img, .masonryMedia .media-body h2{
   max-width: 100%;
 	-moz-transition: all 0.3s;
 	-webkit-transition: all 0.3s;
@@ -28,14 +28,15 @@ code {
 }
 
 .masonryMedia.media:hover img {
-  opacity: .6;
+  opacity: .5;
   -moz-transform: scale(1.1);
 	-webkit-transform: scale(1.1);
 	transform: scale(1.1);
 }
 
 .masonryMedia .media-body {
-  display: none;
+  /* display: none; */
+  display: flex;
   height: 100%;
   width: 100%;
   position: absolute;
@@ -43,12 +44,22 @@ code {
   top: 0;
   padding: 15px;
 }
+.masonryMedia  img{
+  opacity: .9;
+}
+.masonryMedia .media-body p, .masonryMedia .media-body button {
+display: none;
+}
+
+
 .masonryMedia .media-body h2, .masonryMedia .media-body p{
   color:#fff;
   text-align: center;
 }
-.masonryMedia.media:hover .media-body {
-  display: flex;
+
+
+.masonryMedia.media:hover .media-body h2, .masonryMedia.media:hover .media-body p, .masonryMedia.media:hover .media-body button {
+  display: block;
 }
 .img100{
   width: 100%;
