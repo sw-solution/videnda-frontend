@@ -5,6 +5,7 @@ import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
 
 import AuthService from "../../services/auth.service";
+import AppLayout from '../../layouts/App';
 
 const required = (value) => {
     if (!value) {
@@ -94,7 +95,7 @@ const ChangePassword = (props) => {
     };
 
     return (
-        <div className="col-md-12">
+        <AppLayout>
             <div className="card card-container">
                 <img
                     src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
@@ -169,7 +170,7 @@ const ChangePassword = (props) => {
                     <CheckButton style={{ display: "none" }} ref={checkBtn} />
                 </Form>
             </div>
-        </div>
+        </AppLayout>
     );
 };
 

@@ -113,10 +113,9 @@ function App() {
         </Navbar.Collapse>
       </Navbar>
 
-      <div className="container mt-3">
-        <Switch>
-          <Route exact path={["/", "/home"]} component={Home}></Route>
-          <Route exact path="/home-back" component={HomeBK}></Route>
+      <Switch>
+        <Route exact path={["/", "/home"]} component={Home}></Route>
+          <Route path="/home-back" component={HomeBK}></Route>
           <Route path="/signin" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/changePassword" component={ChangePassword} />
@@ -142,8 +141,8 @@ function App() {
           <Route path="/add_token_code" component={AddTokenCode} />
           <Route path="/category_playlists/:category_id" component={CategoryPlaylists} />
           <Route path="*" component={NoMatch} />
-        </Switch>
-      </div>
+      </Switch>
+      
       <Navbar className="fixed-bottom" bg="dark" variant="dark" sticky="bottom">  
         <div className="container text-center">
             <div className="col-sm-12">

@@ -5,6 +5,7 @@ import CheckButton from 'react-validation/build/button';
 import { Link } from 'react-router-dom';
 
 import AuthService from '../../services/auth.service';
+import AppLayout from '../../layouts/App';
 
 const required  =(value)=>{
     if(!value){
@@ -63,7 +64,7 @@ const Login = (props) =>{
     }
 
     return (
-    <div className="col-md-12">
+    <AppLayout>
         <div className="card card-container">
             <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" 
                 alt="profile-img"
@@ -115,7 +116,7 @@ const Login = (props) =>{
                 <CheckButton style={{display: "none"}} ref={checkBtn} />
             </Form>
         </div> 
-    </div>)
+    </AppLayout>)
 }
 
 export default Login;

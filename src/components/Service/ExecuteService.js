@@ -2,6 +2,7 @@ import React from 'react';
 import { InputGroup, FormControl, Button} from 'react-bootstrap';
 import Services from '../../services/execute.service';
 import Auth from '../../services/auth.service';
+import AppLayout from '../../layouts/App';
 
 import Alert from '@material-ui/lab/Alert';
 import MButton from '@material-ui/core/Button';
@@ -101,7 +102,7 @@ const ExecuteService = ()=>{
     }
 
     return (
-    <div className="container">
+    <AppLayout>
         <div className="row">
             <div className="col-md-6">
                 <Button variant="outline-secondary" onClick={handleGetTokenHistory} disabled={loading1}>
@@ -199,7 +200,7 @@ const ExecuteService = ()=>{
                 </pre>
             </div>
         </div>
-    </div>)
+    </AppLayout>)
 }
 
 export default ExecuteService;

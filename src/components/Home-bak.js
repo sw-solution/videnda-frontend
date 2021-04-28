@@ -4,6 +4,8 @@ import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
 
 import UserService from '../services/user.service';
 import CategoryService from '../services/category.service';
+import AppLayout from '../layouts/App';
+
 import {
     Image,
     Button,
@@ -39,13 +41,13 @@ const HomeBK = ()=>{
     }
 
     return (
-        <div className="container">
+        <>
             {categories && categories.length && <CategoryList categories={categories}></CategoryList> || 
                 <div className="jumbotron">
                     <h3>{content}</h3>
                 </div>
             }
-        </div>
+        </>
     )
 }
 
@@ -81,7 +83,7 @@ const CategoryList = (props) => {
 
 
     return (
-        <>
+        <AppLayout>
             <div className="card">
                 <ListGroup variant="flush">
                     {props.categories
@@ -90,7 +92,7 @@ const CategoryList = (props) => {
                         })}
                 </ListGroup>
             </div>
-        </>
+        </AppLayout>
     );
 }
 

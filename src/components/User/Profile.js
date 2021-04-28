@@ -1,5 +1,6 @@
 import React from "react";
 import AuthService from "../../services/auth.service";
+import AppLayout from '../../layouts/App';
 
 const Profile = () => {
   const [currentUser, setCurrentUser] = React.useState(undefined);
@@ -31,7 +32,7 @@ const Profile = () => {
   }
 
   return (
-      <div className="container">
+      <AppLayout>
         {currentUser && currentUser.accessToken ? (
           <>
             {
@@ -85,7 +86,7 @@ const Profile = () => {
             </header>
           )
         }
-      </div>
+      </AppLayout>
   );
 };
 

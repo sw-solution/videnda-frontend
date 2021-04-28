@@ -5,6 +5,7 @@ import Alert from '@material-ui/lab/Alert';
 import MButton from '@material-ui/core/Button';
 import { useHistory } from "react-router-dom";
 import downloadFile from '../../../services/downloadfile'
+import AppLayout from '../../../layouts/App';
 
 const PPTFileList = () => {
 
@@ -53,7 +54,7 @@ const PPTFileList = () => {
     }
 
     return (
-        <>
+        <AppLayout>
             <div className="row">
                 <div className="col-md-4">
                     <label className="btn btn-default p-0">
@@ -88,7 +89,7 @@ const PPTFileList = () => {
             </div>
 
             {pptInfos && <PPTList pptList={pptInfos} />}
-        </>
+        </AppLayout>
     );
 }
 

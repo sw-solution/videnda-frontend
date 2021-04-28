@@ -4,6 +4,7 @@ import queryString from "query-string";
 
 import AuthService from "../../services/auth.service";
 import isEmpty from 'lodash/isEmpty';
+import AppLayout from '../../layouts/App';
 
 class VerifyEmail extends React.Component{
     state = {
@@ -41,7 +42,7 @@ class VerifyEmail extends React.Component{
     }
     render(){
         return (
-            <div className="container">
+            <AppLayout>
                 {this.state.loading?
                 <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -52,7 +53,7 @@ class VerifyEmail extends React.Component{
                 <div className={this.state.successful?"alert alert-success":"alert alert-danger"}>
                     {this.state.message}
                 </div>}
-            </div>
+            </AppLayout>
     )}
 }
 

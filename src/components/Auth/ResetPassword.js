@@ -8,6 +8,7 @@ import queryString from "query-string";
 
 import AuthService from "../../services/auth.service";
 import isEmpty from 'lodash/isEmpty';
+import AppLayout from '../../layouts/App';
 
 class ResetPassword extends React.Component {
     state = {
@@ -112,7 +113,7 @@ class ResetPassword extends React.Component {
         };
 
         return (
-            <div className="container">
+            <AppLayout>
                 {loading ?
                     <div className="text-center">
                         <div className="spinner-border" role="status">
@@ -182,7 +183,7 @@ class ResetPassword extends React.Component {
                             <CheckButton style={{ display: "none" }} ref={(node) => { this.checkBtn = node }} />
                         </Form>
                     </div>}
-            </div>
+            </AppLayout>
         )
     }
 }

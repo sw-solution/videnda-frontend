@@ -2,6 +2,7 @@ import React from 'react';
 import queryString from 'query-string';
 
 import UserService from '../../../services/user.service';
+import AppLayout from '../../../layouts/App';
 
 class AddTokens extends React.Component{
     state={
@@ -40,7 +41,7 @@ class AddTokens extends React.Component{
     render(){
         const {loading, content} = this.state;
         return (
-            <div className="container">
+            <AppLayout>
                 {
                     loading?
                     <div className="text-center">
@@ -71,7 +72,7 @@ class AddTokens extends React.Component{
                         }
                     </>
                 }
-            </div>
+            </AppLayout>
         )
     }
 }

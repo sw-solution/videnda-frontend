@@ -29,6 +29,7 @@ import {
 
 import ReceivedPlaylistService from '../../../services/received-playlist.service';
 import UserService from '../../../services/user.service';
+import AppLayout from '../../../layouts/App';
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -215,7 +216,7 @@ export default function TokenManagement() {
   }
 
   return (
-    <>
+    <AppLayout>
       {errorText &&
           <h5 className="alert alert-danger" style={{position: 'absolute', bottom: 50, right: 50, padding: 40}}>{errorText}</h5>
       }
@@ -328,6 +329,6 @@ export default function TokenManagement() {
           </TableFooter>
         </Table>
       </TableContainer>
-    </>
+    </AppLayout>
   );
 }

@@ -3,6 +3,8 @@ import { useHistory, useParams } from "react-router-dom";
 import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
 
 import CategoryService from '../../services/category.service';
+import AppLayout from '../../layouts/App';
+
 import {
     Image,
     Button,
@@ -10,7 +12,7 @@ import {
     Media,
 } from 'react-bootstrap';
 
-const Home = ()=>{
+const CategoryPlaylists = ()=>{
     const [category, setCategory] = useState(null);
     const [playlists, setPlaylists] = useState([]);
     let history = useHistory();
@@ -29,9 +31,9 @@ const Home = ()=>{
     }
 
     return (
-        <div className="container">
+        <AppLayout>
             {playlists && <PlaylistList playlists={playlists}></PlaylistList>}
-        </div>
+        </AppLayout>
     )
 }
 
@@ -71,4 +73,4 @@ const PlaylistList = (props) => {
     );
 }
 
-export default Home;
+export default CategoryPlaylists;

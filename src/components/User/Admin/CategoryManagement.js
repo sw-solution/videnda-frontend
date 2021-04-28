@@ -31,6 +31,7 @@ import {
 import UserService from '../../../services/user.service';
 import PlaylistService from '../../../services/playlist.service';
 import CategoryService from '../../../services/category.service';
+import AppLayout from '../../../layouts/App';
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -325,7 +326,7 @@ export default function CategoryManagement() {
 
 
     return (
-        <>
+        <AppLayout>
             {errorText &&
                 <h5 className="alert alert-danger" style={{position: 'absolute', bottom: 50, right: 50, padding: 40}}>{errorText}</h5>
             }
@@ -438,6 +439,6 @@ export default function CategoryManagement() {
                 updateCategoryPublicPlaylist={updateCategoryPublicPlaylist}
                 updateCategoryPrivatePlaylists={updateCategoryPrivatePlaylists}
             />
-        </>
+        </AppLayout>
     );
 }

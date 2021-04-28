@@ -13,7 +13,15 @@ code {
 }
 
 
+.app-container {
+  margin-bottom: 56px;
+}
 
+@media (max-width: 450px) {
+  .app-container {
+    margin-bottom: 80px;
+  }
+}
 
 .masonryMedia.media{ overflow: hidden;
   position: relative;

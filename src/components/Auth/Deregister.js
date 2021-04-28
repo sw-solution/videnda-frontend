@@ -4,6 +4,7 @@ import Input from 'react-validation/build/input';
 import CheckButton from 'react-validation/build/button';
 
 import AuthService from '../../services/auth.service';
+import AppLayout from '../../layouts/App';
 
 const required  =(value)=>{
     if(!value){
@@ -57,7 +58,7 @@ const Deregister = (props) =>{
     }
 
     return (
-    <div className="col-md-12">
+    <AppLayout>
         <div className="card card-container">
             <div className="mr-1 ml-1 mt-2 mb-3 text-center">
                 <h2><small>Are you sure you want to deregister?</small></h2>
@@ -106,7 +107,7 @@ const Deregister = (props) =>{
             <CheckButton style={{ display: "none" }} ref={checkBtn} />
         </Form>
         </div>
-    </div>)
+    </AppLayout>)
 }
 
 export default Deregister;

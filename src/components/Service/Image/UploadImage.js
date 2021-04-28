@@ -26,6 +26,7 @@ import {
 
 import UploadService from '../../../services/file-upload.service';
 import ImageService from '../../../services/image.service';
+import AppLayout from '../../../layouts/App';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -576,7 +577,7 @@ const ImageList = (props) => {
     }
 
     return (
-        <>
+        <AppLayout>
             <div className="card">
                 <TextField
                     className={classes.margin}
@@ -622,7 +623,7 @@ const ImageList = (props) => {
                     </Alert>
                 </div>
             }
-        </>
+        </AppLayout>
     );
 }
 

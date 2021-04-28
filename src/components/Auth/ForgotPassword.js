@@ -6,6 +6,7 @@ import CheckButton from 'react-validation/build/button';
 import { isEmail } from "validator";
 
 import AuthService from '../../services/auth.service';
+import AppLayout from '../../layouts/App';
 
 const required = (value) => {
     if (!value) {
@@ -69,7 +70,7 @@ const ForgotPassword = (props) => {
     }
 
     return (
-        <div className="col-md-12">
+        <AppLayout>
             <div className="card card-container">
                 <div className="mr-1 ml-1 mt-2 mb-3 text-center">
                     <h2><small>Input your email and reset password.</small></h2>
@@ -112,7 +113,7 @@ const ForgotPassword = (props) => {
                     <CheckButton style={{ display: "none" }} ref={checkBtn} />
                 </Form>
             </div>
-        </div>)
+        </AppLayout>)
 }
 
 export default ForgotPassword;

@@ -26,6 +26,7 @@ import {
 } from 'react-bootstrap';
 
 import PlaylistService from '../../../services/playlist.service';
+import AppLayout from '../../../layouts/App';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -255,7 +256,7 @@ export default (props) => {
     }
 
     return (
-        <>
+        <AppLayout>
             {videoInfos &&
                 <VideoList
                     videoInfos={videoInfos}
@@ -304,7 +305,7 @@ export default (props) => {
                     </Alert>
                 </div>
             }
-        </>
+        </AppLayout>
     );
 }
 

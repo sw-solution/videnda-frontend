@@ -41,9 +41,9 @@ import {
 import VideoService from '../../../services/video.service';
 import PlaylistService from '../../../services/playlist.service';
 import { LinearProgress, Paper } from '@material-ui/core';
-import { Fragment } from 'react';
 
 import authService from '../../../services/auth.service';
+import AppLayout from '../../../layouts/App';
 
 const front_end_server = GlobalData.front_end_server_ip + ":" + GlobalData.front_end_server_port;
 //const ba-ck_end_server = GlobalData.ba-ck_end_server_ip + ":3000";
@@ -448,7 +448,7 @@ export default () => {
     }
 
     return (
-        <Fragment>
+        <AppLayout>
             <h2 className="mb-3">My Playlists</h2>
             <Row className="mb-3">
                 <Col md={4}>
@@ -592,7 +592,7 @@ export default () => {
                 setManualDescription={setManualDescription}
                 onSave={onSave}
             />
-        </Fragment>
+        </AppLayout>
     );
 }
 

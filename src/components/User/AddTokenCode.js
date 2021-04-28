@@ -1,6 +1,7 @@
 import React from "react";
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
+import AppLayout from '../../layouts/App';
 
 import TextField from '@material-ui/core/TextField';
 import InsertEmoticon from '@material-ui/icons/InsertEmoticon';
@@ -69,7 +70,7 @@ const AddTokenCode = () => {
 
 
   return (
-    <div className="container">
+    <AppLayout>
       <Row  className='mt-5'>
         <Col md={4}>
           <TextField
@@ -114,7 +115,7 @@ const AddTokenCode = () => {
         </div>
       }
 
-    </div>
+    </AppLayout>
   );
 };
 

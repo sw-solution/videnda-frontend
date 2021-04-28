@@ -28,6 +28,7 @@ import VideoService from '../../../services/video.service';
 import { LinearProgress } from '@material-ui/core';
 import SelectOptions from '../../Common/SelectOptions';
 import authService from '../../../services/auth.service';
+import AppLayout from '../../../layouts/App';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -564,7 +565,7 @@ const VideoUpload = () => {
     }
 
     return (
-        <>
+        <AppLayout>
             <Row className="mb-3">
                 <Col md={12}>
                     <TextField
@@ -659,7 +660,7 @@ const VideoUpload = () => {
                 setManualDescription={setManualDescription}
                 onSave={onSave}
             />
-        </>
+        </AppLayout>
     );
 }
 

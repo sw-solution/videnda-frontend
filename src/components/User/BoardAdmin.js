@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import UserService from "../../services/user.service";
+import AppLayout from '../../layouts/App';
 
 const BoardAdmin = () => {
   const [content, setContent] = useState("");
@@ -24,11 +25,11 @@ const BoardAdmin = () => {
   }, []);
 
   return (
-    <div className="container">
+    <AppLayout>
       <header className="jumbotron">
         <h3>{content}</h3>
       </header>
-    </div>
+    </AppLayout>
   );
 };
 
