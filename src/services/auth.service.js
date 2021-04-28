@@ -14,10 +14,9 @@ axios.interceptors.response.use(
         return response
     },
     error => {
-        if (!error.response) {
-            console.log("Connection to local-host failed err=" + error.message);
+        if ( !error.response) {
+            console.log( "Connection to local-host failed err=" + error.message);
         }
-
         return Promise.reject(error)
     }
 );

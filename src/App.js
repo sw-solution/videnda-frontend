@@ -148,7 +148,7 @@ function App() {
         <div className="container text-center">
             <div className="col-sm-12">
 
-                <p className="text-center twhite m-2"> <a href="#" className="twhite"> Licence Terms</a> || Copyright © 2021 Videnda AI</p>
+                <p className="text-center twhite m-2"> <a href="#" className="twhite"> Licence Terms</a> Copyright © 2021 Videnda AI</p>
             </div>
         </div>
       </Navbar>
