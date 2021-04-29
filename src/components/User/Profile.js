@@ -46,6 +46,9 @@ const Profile = () => {
                     )}
                     <span>Button</span></button> to resend the verify email.
                 </div>
+                <div className={"alert alert-danger"}>
+                  Verify your email to get 5 points.                  
+                </div>
               </>
             }
             {

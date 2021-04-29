@@ -71,6 +71,28 @@ const AddTokenCode = () => {
 
   return (
     <AppLayout>
+
+{currentUser && currentUser.accessToken ? (
+          <>
+            {
+              currentUser.verified_email==="none"&&
+              <>
+         
+                <div className={"alert alert-danger"}>
+                  Verify your email to get 5 points.                  
+                </div>
+              </>
+            }                 
+          </>
+        ):(
+            <header className="jumbotron">
+                <h3>
+                  <strong>Please Login</strong>
+                </h3>
+            </header>
+          )
+        }
+
       <Row  className='mt-5'>
         <Col md={4}>
           <TextField
