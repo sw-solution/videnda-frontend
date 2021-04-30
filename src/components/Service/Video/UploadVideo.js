@@ -708,7 +708,8 @@ const VideoList = (props) => {
                             >
                                 Edit
                             </Button>
-                            <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                            {/* <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove 0</Button> */}
+                            <Button variant="danger" size="sm" onClick={() => { if (window.confirm('Are you sure you wish to delete this item?')) props.handleRemoveItem(data.id) } } >Remove</Button>
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&

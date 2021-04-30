@@ -45,7 +45,7 @@ const Profile = () => {
                         <span className="spinner-border spinner-border-sm"></span>
                     )}
                     <span>Button</span></button> to resend the verify email.
-                </div>
+                </div>                
               </>
             }
             {
