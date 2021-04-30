@@ -23,6 +23,8 @@ const AddTokenCode = () => {
   const [message, setMessage] = React.useState('');
   const [tokenCode, setTokenCode] = React.useState('');
   const history = useHistory();
+  const [mailSendError, setMailSendError] = React.useState(false);
+  const [sending, setSending] = React.useState(false);
 
   console.log( "AddTokenCode get profile");
   React.useEffect(()=>{
@@ -41,6 +43,23 @@ const AddTokenCode = () => {
             //}, 3000);
         });
   }, [])
+
+  const resendVerifyEmail=()=>{
+    setSending(true);
+    AuthService.resendVerifyEmail().then((response)=>{
+      setMailSendError(false);
+      setSending(false);
+      setMessage(response.data.message);
+    }, error=>{
+      const resMessage=(
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+      ) || error.toString();
+      setSending(false);
+      setMessage(resMessage);
+    });
+  }
 
   console.log( "AddTokenCode add tokens");
   const handleAddTokens = (e) => {
@@ -78,11 +97,23 @@ const AddTokenCode = () => {
               currentUser.verified_email==="none"&&
               <>
          
-                <div className={"alert alert-danger"}>
-                  Verify your email to get 5 points.                  
-                </div>
+              <div className={"alert alert-danger"}>
+                  You need to verify your email. If you didn't receive the verify email, please click this{` `}
+                  <button className="btn btn-primary btn-sm" onClick={resendVerifyEmail} disabled={sending}>
+                    {sending && (
+                        <span className="spinner-border spinner-border-sm"></span>
+                    )}
+                    <span>Button</span></button> to resend the verify email.
+                </div>                
               </>
-            }                 
+              
+            }             
+            {
+              message &&
+              <div className={mailSendError ? "alert alert-danger" : "alert alert-danger"}>
+                {message}
+              </div>
+            }    
           </>
         ):(
             <header className="jumbotron">
