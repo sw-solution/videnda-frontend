@@ -290,21 +290,23 @@ export default function CategoryManagement() {
     }
 
     const removeCategory = (id) => {
-        setRows([])
-        setData([])
-        
-        CategoryService.removeCategory(id)
-        .then(response => {
-            if( response.data.message == 'success')
-                getAllCategory()
-        }).catch((err) => {
-            const resMessage = (
-                err.response &&
-                err.response.data &&
-                err.response.data.message
-            ) || err.toString();
-            console.log(resMessage);
-        });
+        if (window.confirm('Are you sure?')) {
+            setRows([])
+            setData([])
+            
+            CategoryService.removeCategory(id)
+            .then(response => {
+                if( response.data.message == 'success')
+                    getAllCategory()
+            }).catch((err) => {
+                const resMessage = (
+                    err.response &&
+                    err.response.data &&
+                    err.response.data.message
+                ) || err.toString();
+                console.log(resMessage);
+            });
+        }
     }
 
     const handleSearch = (e) => {

@@ -150,20 +150,22 @@ export default function CustomPaginationActionsTable() {
 
   // playlistId
   const handleDelete = (id) => {
-    ReceivedPlaylistService.removePlaylist(id)
-      .then(response => {
-        if (response.data.message === "success") {
-          window.location.reload();
-        }
-      }).catch((err) => {
-        const resMessage = (
-          err.response &&
-          err.response.data &&
-          err.response.data.message
-        ) || err.toString();
+    if (window.confirm('Are you sure?')) {
+      ReceivedPlaylistService.removePlaylist(id)
+        .then(response => {
+          if (response.data.message === "success") {
+            window.location.reload();
+          }
+        }).catch((err) => {
+          const resMessage = (
+            err.response &&
+            err.response.data &&
+            err.response.data.message
+          ) || err.toString();
 
-        console.log(resMessage);
-      });
+          console.log(resMessage);
+        });
+    }
   }
 
   // custom

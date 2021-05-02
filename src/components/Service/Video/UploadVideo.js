@@ -434,22 +434,24 @@ const VideoUpload = () => {
 
     // Remove one video item
     const handleRemoveItem = (id) => {
-        VideoService.removeVideo(id)
-            .then(response => {
-                if (response.data.message === "success") {
-                    let arr = [...videoInfos];
-                    arr = arr.filter(item => item.id !== id);
-                    setVideoInfos(arr);
-                }
-            }).catch((err) => {
-                const resMessage = (
-                    err.response &&
-                    err.response.data &&
-                    err.response.data.message
-                ) || err.toString();
-
-                setMessage(resMessage);
-            });
+        if (window.confirm('Are you sure?')) {
+            VideoService.removeVideo(id)
+                .then(response => {
+                    if (response.data.message === "success") {
+                        let arr = [...videoInfos];
+                        arr = arr.filter(item => item.id !== id);
+                        setVideoInfos(arr);
+                    }
+                }).catch((err) => {
+                    const resMessage = (
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.message
+                    ) || err.toString();
+    
+                    setMessage(resMessage);
+                });
+        }
     }
 
     function meta_restriction_age_str(meta) {
@@ -709,7 +711,7 @@ const VideoList = (props) => {
                                 Edit
                             </Button>
                             {/* <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove 0</Button> */}
-                            <Button variant="danger" size="sm" onClick={() => { if (window.confirm('Are you sure you wish to delete this item?')) props.handleRemoveItem(data.id) } } >Remove</Button>
+                            <Button variant="danger" size="sm" onClick={() => { props.handleRemoveItem(data.id) } } >Remove</Button>
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&

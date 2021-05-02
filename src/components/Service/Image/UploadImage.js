@@ -444,7 +444,7 @@ const ImageUpload = () => {
 
 
     return (
-        <>
+        <AppLayout>
             <Row className="mb-3">
                 <Col md={4}>
                     <label className="btn btn-default p-0">
@@ -505,7 +505,7 @@ const ImageUpload = () => {
                     }
                 </Col>
             </Row>
-        </>
+        </AppLayout>
     );
 }
 

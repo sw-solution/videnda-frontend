@@ -260,22 +260,24 @@ export default () => {
 
     // Remove one video item
     const handleRemoveItem = (id) => {
-        VideoService.removeVideo(id)
-            .then(response => {
-                if (response.data.message === "success") {
-                    let arr = [...videoInfos];
-                    arr = arr.filter(item => item.id !== id);
-                    setVideoInfos(arr);
-                }
-            }).catch((err) => {
-                const resMessage = (
-                    err.response &&
-                    err.response.data &&
-                    err.response.data.message
-                ) || err.toString();
+        if (window.confirm('Are you sure?')) {
+            VideoService.removeVideo(id)
+                .then(response => {
+                    if (response.data.message === "success") {
+                        let arr = [...videoInfos];
+                        arr = arr.filter(item => item.id !== id);
+                        setVideoInfos(arr);
+                    }
+                }).catch((err) => {
+                    const resMessage = (
+                        err.response &&
+                        err.response.data &&
+                        err.response.data.message
+                    ) || err.toString();
 
-                setMessage(resMessage);
-            });
+                    setMessage(resMessage);
+                });
+        }
     }
 
     // Play one video
@@ -335,16 +337,17 @@ export default () => {
 
     // delete
     const handleSettingShow = () => {
-        setSettingShow(false)
-
-        PlaylistService.removePlaylist(currentPlaylistId)
-            .then(response => {
-                if (response.data.message === 'success') {
-                    getAllPlaylists();
-                    setCurrentPlaylistId('');
-                    window.location.reload();
-                }
-            })
+        if (window.confirm('Are you sure?')) {
+            setSettingShow(false)
+            PlaylistService.removePlaylist(currentPlaylistId)
+                .then(response => {
+                    if (response.data.message === 'success') {
+                        getAllPlaylists();
+                        setCurrentPlaylistId('');
+                        window.location.reload();
+                    }
+                })
+        }
     }
 
     // change

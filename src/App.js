@@ -69,7 +69,6 @@ function App() {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mr-auto">
             <Nav.Link href="/home">Home</Nav.Link>
-            <Nav.Link href="/home-back">Home BK</Nav.Link>
             {showModeratorBoard && (
               <Nav.Link href="/mod">Moderator Board</Nav.Link>
             )}
@@ -110,6 +109,9 @@ function App() {
                 <Nav.Link href="/register">Sign Up</Nav.Link>
               </Nav>
             )}
+          <Nav className="mr-auto">
+            <Nav.Link href="/home-back">Site Map</Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Navbar>
 
@@ -142,8 +144,8 @@ function App() {
           <Route path="/category_playlists/:category_id" component={CategoryPlaylists} />
           <Route path="*" component={NoMatch} />
       </Switch>
-      
-      <Navbar className="fixed-bottom" bg="dark" variant="dark" sticky="bottom">  
+
+      <Navbar className="fixed-bottom" bg="dark" variant="dark" sticky="bottom">
         <div className="container text-center">
             <div className="col-sm-12">
 
@@ -152,7 +154,7 @@ function App() {
         </div>
       </Navbar>
     </Router>
-    
+
   )
 }
 
