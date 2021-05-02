@@ -34,7 +34,9 @@ const useStyles = makeStyles((theme) => ({
 const MyVerticallyCenteredModal = (props) => {
     const [playingStatus, setPlayingStatus] = useState(true);
     const classes = useStyles();
-
+	onClickFullScreen = () => {
+		screenfull.request(findDOMNode(this.refs.player))
+	}
     return (
         <Modal
             {...props}
@@ -50,19 +52,26 @@ const MyVerticallyCenteredModal = (props) => {
             <Modal.Body>
                 <Row>
                     <Col md={9}>
-                        <ReactPlayer url={props.playUrl} playing={true} width={GlobalData.modal_video_player_width} height={GlobalData.modal_video_player_height} controls={true} playing={playingStatus} />
+                        <ReactPlayer
+                            ref='player'
+                        	url={props.playUrl}
+                        	playing={true}
+                        	width={GlobalData.modal_video_player_width}
+                        	height={GlobalData.modal_video_player_height}
+                        	controls={true}
+                        	playing={playingStatus} />
                         <p><i>{props.metaDescription}</i></p>
                     </Col>
                     <Col md={3} style={{borderLeft: '1px solid lightgray'}}>
-                        <h5 style={{borderBottom: '1px solid lightgray', paddingBottom: 5, display: 'flex', justifyContent: 'center'}}>Video List</h5>
+                        <h5 style={{borderBottom: '1px solid lightgray',
+                        	paddingBottom: 5, display: 'flex',
+                        	justifyContent: 'center'}}>Video List</h5>
                         <Paper style={{height: 450, overflow: 'auto'}}>
                         <List className={classes.root}>
-
                             {props.videoData.length > 0 &&
                                 props.videoData.map(item => {
                                     let title = item.manual_title || item.meta_title;
                                     let description = item.manual_description || item.meta_description;
-
                                     return (
                                     <>
                                         <ListItem alignItems="flex-start"
@@ -102,6 +111,7 @@ const MyVerticallyCenteredModal = (props) => {
             <Modal.Footer>
                 {/* <p style={{marginRight: '5%'}}>{props.currentVideoNumber} of {Object.keys(props.videoData).length}</p> */}
                 <Button variant="danger" onClick={props.onHide}>Close</Button>
+                <Button variant="info" onClick={onClickFullScreen()}>Maximize</Button>
                 <Button style={{marginRight: '10px'}} variant="info" onClick={() => {
                     setPlayingStatus(false);
                     props.onOpenSourceUrl();

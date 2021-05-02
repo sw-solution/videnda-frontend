@@ -448,7 +448,7 @@ const VideoUpload = () => {
                         err.response.data &&
                         err.response.data.message
                     ) || err.toString();
-    
+
                     setMessage(resMessage);
                 });
         }
@@ -651,6 +651,8 @@ const VideoUpload = () => {
                 onOpenSourceUrl={onOpenSourceUrl}
                 currentVideoNumber={currentVideoNumber}
                 itemClick={itemClick}
+                onPreviousVideo={onPreviousVideo}
+				//onClickFullScreen={onClickFullScreen}
                 //myPlayingStatus={true}
             />
             <EditDialog

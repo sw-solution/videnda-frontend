@@ -13,6 +13,9 @@ import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 
 import GlobalData from '../../../tools/GlobalData';
+//maximize stuff
+import { findDOMNode } from 'react-dom';
+import screenfull from 'screenfull';
 
 import {
     Button,
@@ -37,8 +40,20 @@ const VideoPlayer = (props) => {
     counterCalls = counterCalls + 1;
     const classes = useStyles();
     const ref = React.createRef();
+    	//const [ref, setRef] = useState( React.createRef());
+	/*
+		React.useEffect(()=>{
+			console.log( "useEffect onClickFullScreen ref", ref);
+			if( ref){
+				console.log( "useEffect onClickFullScreen ref.current", ref.current);
+			}
+		});
+		}, [ref]);
+	*/
+
+
     var seek_time = 0;
-    
+
     //playingStatus = true;
 
     if( props.playUrl ) {
@@ -49,6 +64,30 @@ const VideoPlayer = (props) => {
     //	console.log( "detected playingStatus=", counterCalls, playingStatus);
 		//setPlayingStatus( props.myPlayingStatus);
 	//}
+
+	const onClickFullScreen = (ref) => {
+		console.log( "onClickFullScreen ref", ref);
+		let status = "onClickFullScreen start";
+		if( ref){
+			status += "+ref";
+			console.log( "onClickFullScreen ref.current", ref.current);
+			//console.log( "onClickFullScreen ref.current", ref.current());
+		}
+		if( ref.current){
+			status += "+current";
+			screenfull.request(findDOMNode( ref.current));
+			console.log( "onClickFullScreen ref.current ZERO", ref.current[0]);
+			if( ref.current[0]){
+				status += "+0";
+				screenfull.request( ref.current[0]);
+			}
+		}
+		console.log( "onClickFullScreen STATUS", status);
+		//alert( status);
+		//screenfull.request(findDOMNode( ref.current));
+		//screenfull.request(findDOMNode(this.refs.player))
+	}
+
     return (
         <Modal
             show={props.show}
@@ -61,7 +100,7 @@ const VideoPlayer = (props) => {
             aria-labelledby="contained-modal-title-vcenter"
             centered
         >
-            
+
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
                     {props.metaTitle}
@@ -71,7 +110,7 @@ const VideoPlayer = (props) => {
                 <Row>
                     <Col md={9}>
                         <ReactPlayer
-                            ref={ ref }
+                            ref={ref}
                             url={props.playUrl}
                             width={GlobalData.modal_video_player_width}
                             height={GlobalData.modal_video_player_height}
@@ -136,6 +175,11 @@ const VideoPlayer = (props) => {
                     setPlayingStatus(true);
 					props.onHide();
 				}}>Close</Button>
+                <Button variant="info" onClick={() =>{
+                    setPlayingStatus(true);
+					//props.onClickFullScreen(ref);
+					onClickFullScreen(ref);
+					}}>Max</Button>
                 <Button variant="primary" onClick={() => {
                     setPlayingStatus(true);
 					props.onPreviousVideo();
