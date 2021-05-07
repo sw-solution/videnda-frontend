@@ -19,6 +19,7 @@ class VideoService {
   }
 
   addPlaylistIds(video_id, playlist_ids) {
+    console.log('VID &PIDS',video_id, playlist_ids)
     const currentUser = Auth.getCurrentUser();
     return axios.post(`${VIDEO_API_URL}addPlaylistIds?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`, playlist_ids);
   }

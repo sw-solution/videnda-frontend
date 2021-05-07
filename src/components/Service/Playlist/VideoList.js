@@ -457,7 +457,7 @@ const VideoList = (props) => {
                     }
                     {props.contentType=='Video' && 
                     
-                        <>
+                        <>                       
                         <TextField
                             className={classes.margin}
                             id="input-with-icon-textfield"

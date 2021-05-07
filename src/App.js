@@ -41,7 +41,7 @@ import Playlist from './components/Service/Playlist/Playlist'
 import BlogPlaylist from './components/Service/Playlist/BlogPlaylist'
 import ReceivedPlaylist from './components/Service/ReceivedPlaylist/ReceivedPlaylist';
 import VideoList from './components/Service/Playlist/VideoList'
-import BlogSingle from './components/Service/Playlist/BlogSingle'
+import BlogSingle from './components/User/Admin/blog/BlogSingle'
 import AddTokenCode from './components/User/AddTokenCode';
 import CategoryPlaylists from './components/User/CategoryPlaylists';
 

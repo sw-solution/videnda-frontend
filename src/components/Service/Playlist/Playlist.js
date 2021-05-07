@@ -355,6 +355,7 @@ export default () => {
         setSettingShow(false)
         PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus, currentPlaylistThumbVideo, currentPlaylistType)
             .then(response => {
+                console.log('sss',response)
                 if (response.data.message === 'success') {
                     getAllPlaylists();
                     setCurrentPlaylistId('');

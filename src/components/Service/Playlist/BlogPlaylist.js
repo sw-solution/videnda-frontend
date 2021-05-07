@@ -123,7 +123,7 @@ const SettingDialog = (props) => {
                             value={props.currentPlaylistThumbVideo}
                             onChange={(e) => props.setCurrentPlaylistThumbVideo(e.target.value)}
                         >
-                            <MenuItem value="0" disabled> Choose a video for thumbnail </MenuItem>
+                            <MenuItem value="0" disabled> Choose a item for thumbnail </MenuItem>
                             { props.videoInfos.map((item, index) => {
                                 console.log(index, item)
                                 return (
@@ -646,7 +646,7 @@ const VideoList = (props) => {
                     <Row>
                         <Col className="align-self-end pb-4">
                             
-                            <Button variant="info" size="sm" className="mr-2"
+                            {/* <Button variant="info" size="sm" className="mr-2"
                                 onClick={() => {
                                     props.setManualTitle(data.manual_title ? data.manual_title : data.meta_title);
                                     props.setManualDescription(data.manual_description ? data.manual_description : data.meta_description);
@@ -656,7 +656,7 @@ const VideoList = (props) => {
                             >
                                 Edit
                             </Button>
-                            <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                            <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button> */}
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&
@@ -669,7 +669,7 @@ const VideoList = (props) => {
                                     multiple={true}
                                 />
                             }
-                            { isAdmin && 
+                            {/* { isAdmin && 
                                 <SelectOptions
                                     label='Type'
                                     id={data.id}
@@ -681,7 +681,7 @@ const VideoList = (props) => {
                                     onSave={props.setVideoType}
                                     multiple={false}
                                 />
-                            }
+                            } */}
                         </Col>
                     </Row>
                 </Media.Body>
