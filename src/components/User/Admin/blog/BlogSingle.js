@@ -155,24 +155,24 @@ const SingleBlog = (props) => {
 
     const renderBlog = (data) => (
         <>
-        <Card  className="col-md-10 offset-md-1" key={data.id}>
-        <Card.Img variant="top" src={data.feature_image} />
-        <Card.Body>
-            <Card.Title>{data.title}</Card.Title>
-            <Card.Text className="mt-3"> 
+        <div  className="col-md-10 offset-md-1" key={data.id}>
+        <img  src={data.feature_image} className="img-fluid"/>
+        <div>
+            <h2>{data.title}</h2>
+            <div className="mt-3"> 
             {data.description}
-            </Card.Text>
-            <Card.Text className="mt-3">
+            </div>
+            <div className="mt-3">
             
             {renderHTML(data.content)}
             
-            </Card.Text>
+            </div>
             
-        </Card.Body>
+        </div>
             
             
             
-        </Card>
+        </div>
         </>
     );
 
