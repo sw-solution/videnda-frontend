@@ -25,6 +25,8 @@ import TokenManagement from "./components/User/Admin/TokenManagement";
 import CategoryManagement from "./components/User/Admin/CategoryManagement";
 import ExecuteService from "./components/Service/ExecuteService";
 import NoMatch from './components/NoMatch';
+import Blogs from "./components/User/Admin/blog/Blogs";
+// import BlogCreate from "./components/User/Admin/blog/BlogCreate";
 
 import authService from './services/auth.service';
 // image
@@ -36,8 +38,10 @@ import EditPPT from './components/Service/PPT/EditPPT';
 // video
 import UploadVideo from './components/Service/Video/UploadVideo'
 import Playlist from './components/Service/Playlist/Playlist'
+import BlogPlaylist from './components/Service/Playlist/BlogPlaylist'
 import ReceivedPlaylist from './components/Service/ReceivedPlaylist/ReceivedPlaylist';
 import VideoList from './components/Service/Playlist/VideoList'
+import BlogSingle from './components/Service/Playlist/BlogSingle'
 import AddTokenCode from './components/User/AddTokenCode';
 import CategoryPlaylists from './components/User/CategoryPlaylists';
 
@@ -83,10 +87,14 @@ function App() {
             <Nav className="ml-auto">
               {showAdminBoard && (
                 <NavDropdown title='Admin Menu' id="collasible-nav-dropdown" alignRight >
+             
+                  <NavDropdown.Item href="/admin/blog/blogs">Blog</NavDropdown.Item>
+                  <NavDropdown.Item href="/blog-playlists">Blog Playlist</NavDropdown.Item>
                   <NavDropdown.Item href="/token_management">Token Management</NavDropdown.Item>
                   <NavDropdown.Item href="/admin/categories">Category Management</NavDropdown.Item>
                 </NavDropdown>
               )}
+              
               <NavDropdown title='Services' id="collasible-nav-dropdown" alignRight >
                 <NavDropdown.Item href="/upload_image">Upload Image</NavDropdown.Item>
                 <NavDropdown.Item href="/upload_video">Upload Video</NavDropdown.Item>
@@ -127,6 +135,7 @@ function App() {
           <Route path="/profile" component={Profile} />
           <Route path="/resetpassword/reset" component={ResetPassword} />
           <Route path="/token_management" component={TokenManagement} />
+          <Route path="/admin/blog/blogs" component={Blogs}/>
           <Route path="/execute_service" component={ExecuteService} />
           <Route path="/upload_image" component={UploadImage} />
           <Route path="/edit_image/:image_id" component={EditImage} />
@@ -134,7 +143,9 @@ function App() {
           <Route path="/manage_ppt/edit_ppt/:ppt_id" component={EditPPT} />
           <Route path="/upload_video" component={UploadVideo} />
           <Route path="/playlists" component={Playlist} />
+          <Route path="/blog-playlists" component={BlogPlaylist} />
           <Route path="/playlist/:playlist_id" component={VideoList} />
+          <Route path="/blog/:id" component={BlogSingle} />
           <Route path="/received_playlist" component={ReceivedPlaylist} />
           <Route path="/user" component={BoardUser} />
           <Route path="/mod" component={BoardModerator} />

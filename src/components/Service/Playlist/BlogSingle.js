@@ -21,11 +21,14 @@ import MButton from '@material-ui/core/Button';
 import {
     Image,
     Button,
+    Col,
+    Card,
     ListGroup,
     Media,
 } from 'react-bootstrap';
 
 import PlaylistService from '../../../services/playlist.service';
+import BlogService from '../../../services/blog.service';
 import AppLayout from '../../../layouts/App';
 
 const useStyles = makeStyles((theme) => ({
@@ -48,11 +51,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const getVideoId = (url) => {
-    if(url){
-        return url.split("?v=")[1];    
-    }else{
-        return null        
-    }
+    // return url.split("?v=")[1];
 }
 
 export default (props) => {
@@ -68,13 +67,12 @@ export default (props) => {
     const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
     const [metaDescription, setMetaDescription] = useState(null);
     const [errorText, setErrorText] = useState('');
-    const [contentType, setContentType] = useState('Video');
 
 
     let history = useHistory();
 
     let params = useParams();
-    let playlistId = params.playlist_id || history.push("/404");
+    let playlistId = params.id || history.push("/404");
 
     useEffect(() => {
         getAllVideos();
@@ -82,33 +80,24 @@ export default (props) => {
 
     const getAllVideos = () => {
         if (playlistId != null)
-        PlaylistService.getPublicPlaylist(playlistId)
-        .then(async response => {            
-            console.log(playlistId)
-                if (response.data && response.data.length > 0) {                
-                    setVideoData(response.data)
-                    setVideoInfos(response.data);                    
-                    const total = Math.ceil(response.data.length / itemsPerPage);
-                    setTotalPages(total);
-                }else{
-                    PlaylistService.getBlogPlaylist(playlistId)
-                    .then(async resp=>{
-                        console.log('resp', resp)
-                        setVideoData(resp.data)
-                        setVideoInfos(resp.data);
-                        setContentType('Blog')
-                        const total = Math.ceil(resp.data.length / itemsPerPage);
+        BlogService.getSingleBlog(playlistId)
+                .then(async response => {
+                    console.log(response)
+                    if (response.data && response.data.length > 0) {
+
+                        setVideoData(response.data)
+                        setVideoInfos(response.data);
+
+                        const total = Math.ceil(response.data.length / itemsPerPage);
                         setTotalPages(total);
-                    })
-                
                     }
                 }).catch(error => {
                     console.log(error.response)
 
-                    if ( error.response.status == 401 )
-                        history.push("/signin");
-                    else if ( error.response.status == 403 || error.response.status == 404 )
-                        history.push("/404");
+                    // if ( error.response.status == 401 )
+                    //     history.push("/signin");
+                    // else if ( error.response.status == 403 || error.response.status == 404 )
+                    //     history.push("/404");
                 })
     }
 
@@ -122,30 +111,6 @@ export default (props) => {
         // eslint-disable-next-line array-callback-return
         let data = videoData.filter(item => {
             let fileName = item.meta_keyword + item.meta_description + item.meta_title + getVideoId(item.video_id);
-            fileName = fileName.trim().toLowerCase();
-
-            if (keyword === "") {
-                return 1;
-            }
-
-            if (fileName.includes(keyword)) {
-                return 1;
-            }
-        });
-
-        setVideoInfos(data);
-
-        const total = Math.ceil(data.length / itemsPerPage);
-        setTotalPages(total);
-
-        localStorage.removeItem('videolistpage');
-        setPageNumber(1);
-    }
-    const handleChangeKeywordBlog = (key) => {
-        const keyword = key.trim().toLowerCase();
-        // eslint-disable-next-line array-callback-return
-        let data = videoData.filter(item => {
-            let fileName = item.title + item.description;
             fileName = fileName.trim().toLowerCase();
 
             if (keyword === "") {
@@ -299,12 +264,10 @@ export default (props) => {
             {videoInfos &&
                 <VideoList
                     videoInfos={videoInfos}
-                    contentType={contentType}
                     totalPages={totalPages}
                     itemsPerPage={itemsPerPage}
                     currentPage={pageNumber}
                     onChangeKeyword={handleChangeKeyword}
-                    onChangeKeywordBlog={handleChangeKeywordBlog}
                     onChangePageNumber={handleChangePageNumber}
                     handlePlayVideo={handlePlayVideo}
                 />
@@ -355,61 +318,29 @@ const VideoList = (props) => {
     const classes = useStyles();
 
     const renderItem = (data) => (
-        <ListGroup.Item key={data.id}>
-            <Media>
-                <Image thumbnail src={data.meta_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)} />
-                <Media.Body>
-                    <h5><span>{data.manual_title || data.meta_title}</span></h5>
-                    <p style={{ marginBottom: "0px" }}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
-                    <p style={{ marginBottom: "2px" }}><span>{data.manual_description || data.meta_description}</span></p>
-                    {data.meta_keyword && (
-                        <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
-                    )}
-                    <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
-                        className="mr-2"
-                        onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)}>
-                        Play Video
-                    </Button>
-                </Media.Body>
-            </Media>
-        </ListGroup.Item>
-    );
-    const renderItemBlog = (data) => (
-        <ListGroup.Item key={data.id}>
-            <Media>
-                <Image thumbnail src={data.feature_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)} />
-                <Media.Body>
-                    <h5><span>{data.title || data.title}</span></h5>
-                    <p style={{ marginBottom: "2px" }}><span>{data.description }</span></p>
-                    {data.meta_keyword && (
-                        <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
-                    )}
-                    <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
-                        className="mr-2"
-                        href={'/blog/'+data.id}
-                        // onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)}
-                        >
-                        Open
-                    </Button>
-                </Media.Body>
-            </Media>
-        </ListGroup.Item>
+        <>
+        <Card  className="col-md-10 offset-md-1" key={data.id}>
+        <Card.Img variant="top" src={data.feature_image} />
+        <Card.Body>
+            <Card.Title>{data.title}</Card.Title>
+            <Card.Text className="mt-3"> 
+            {data.description}
+            </Card.Text>
+            <Card.Text className="mt-3">
+            {data.content}
+            </Card.Text>
+            
+        </Card.Body>
+            
+            
+            
+        </Card>
+        </>
     );
 
     const showPagenationItem = () => {
 
-        return (
-            <Pagination
-                color="primary"
-                className="mt-3"
-                shape="rounded"
-                count={props.totalPages}
-                page={props.currentPage}
-                onChange={(event, val) => props.onChangePageNumber(val)}
-            />
-        );
+        return ;
     }
 
     const doSomethingWith = (e) => {
@@ -417,74 +348,20 @@ const VideoList = (props) => {
             props.onChangeKeyword(e.target.value);
         }
     }
-    const doSomethingWithBlog = (e) => {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            props.onChangeKeywordBlog(e.target.value);
-        }
-    }
 
     return (
         <>
             <div className="card">
-                              
-                    {props.contentType=='Blog' && 
-                        <> 
-                        <TextField
-                            className={classes.margin}
-                            id="input-with-icon-textfield"
-                            placeholder="Search"
-                            onKeyDown={doSomethingWithBlog}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />  
-                        <h3 className="card-header">List of Blogs</h3>
-                        <ListGroup variant="flush">
-                            {props.videoInfos
-                                && props.videoInfos.map((video, index) => {
-                                    if ((props.currentPage - 1) * props.itemsPerPage <= index && (props.currentPage) * props.itemsPerPage > index) {
-                                        return renderItemBlog(video)                                
-                                    } else {
-                                        return null
-                                    }
-                                })}
-                        </ListGroup>
-                        </>
-                    }
-                    {props.contentType=='Video' && 
-                    
-                        <>
-                        <TextField
-                            className={classes.margin}
-                            id="input-with-icon-textfield"
-                            placeholder="Search"
-                            onKeyDown={doSomethingWith}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />  
-                        <h3 className="card-header">List of Videos</h3>
-                        <ListGroup variant="flush">
-                            {props.videoInfos
-                                && props.videoInfos.map((video, index) => {
-                                    if ((props.currentPage - 1) * props.itemsPerPage <= index && (props.currentPage) * props.itemsPerPage > index) {
-                                        return renderItem(video)                                
-                                    } else {
-                                        return null
-                                    }
-                                })}
-                        </ListGroup>
-                        </>
-                    }
-            
+                <ListGroup variant="flush">
+                    {props.videoInfos
+                        && props.videoInfos.map((video, index) => {
+                            if ((props.currentPage - 1) * props.itemsPerPage <= index && (props.currentPage) * props.itemsPerPage > index) {
+                                return renderItem(video)
+                            } else {
+                                return null
+                            }
+                        })}
+                </ListGroup>
                 {showPagenationItem()}
             </div>
         </>
