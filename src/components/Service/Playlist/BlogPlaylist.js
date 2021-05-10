@@ -649,7 +649,7 @@ const VideoList = (props) => {
 
                     <Row>
                         <Col className="align-self-end pb-4">
-                            
+                        <Button size="sm" variant="primary" block href={'/blog/'+data.id} target="_mew">Open</Button>
                             {/* <Button variant="info" size="sm" className="mr-2"
                                 onClick={() => {
                                     props.setManualTitle(data.manual_title ? data.manual_title : data.meta_title);
