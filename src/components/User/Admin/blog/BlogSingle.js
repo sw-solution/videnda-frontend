@@ -179,7 +179,7 @@ const SingleBlog = (props) => {
 
     return (
         <>
-            <div className="card">
+            <div className="">
                 <ListGroup variant="flush">
                     {props.blogInfos
                         && props.blogInfos.map((blog, index) => {
