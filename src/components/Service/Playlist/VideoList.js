@@ -199,6 +199,11 @@ export default (props) => {
                 }, 5000);
             });
     }
+    const handlePlayBlog = (blogId) => {
+        let nextUrl='../blog/'+blogId
+        console.log(blogId, nextUrl)
+        window.open(nextUrl, '_blank');
+    }
 
     const onNextVideo = () => {
         const index = videoData.findIndex(item => item.id == videoId);
@@ -311,6 +316,7 @@ export default (props) => {
                     onChangeKeywordBlog={handleChangeKeywordBlog}
                     onChangePageNumber={handleChangePageNumber}
                     handlePlayVideo={handlePlayVideo}
+                    handlePlayBlog={handlePlayBlog}
                 />
             }
             <VideoPlayer
@@ -382,7 +388,7 @@ const VideoList = (props) => {
     const renderItemBlog = (data) => (
         <ListGroup.Item key={data.id}>
             <Media>
-                <Image thumbnail src={data.feature_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)} />
+                <Image thumbnail src={data.feature_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayBlog(data.id )} />
                 <Media.Body>
                     <h5><span>{data.title || data.title}</span></h5>
                     <p style={{ marginBottom: "2px" }}><span>{data.description }</span></p>
@@ -392,7 +398,7 @@ const VideoList = (props) => {
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
                     <Button variant="primary" size="sm" style={{ padding: '5px 20px' }}
                         className="mr-2"
-                        href={'/blog/'+data.id}
+                        href={'/blog/'+data.id} target="_new"
                         // onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)}
                         >
                         Open
@@ -449,9 +455,9 @@ const VideoList = (props) => {
                         <h3 className="card-header">List of Blogs</h3>
                         <ListGroup variant="flush">
                             {props.videoInfos
-                                && props.videoInfos.map((video, index) => {
+                                && props.videoInfos.map((blog, index) => {
                                     if ((props.currentPage - 1) * props.itemsPerPage <= index && (props.currentPage) * props.itemsPerPage > index) {
-                                        return renderItemBlog(video)                                
+                                        return renderItemBlog(blog)                                
                                     } else {
                                         return null
                                     }
