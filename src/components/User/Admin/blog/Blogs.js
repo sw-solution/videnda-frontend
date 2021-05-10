@@ -164,7 +164,7 @@ const BlogModal = (props) => {
                                 value={props.blogPublicPlaylist}
                                 items={props.publicPlaylists}
                                 onSave={props.updateBlogPublicPlaylist}
-                                multiple={true}
+                                multiple={false}
                             />
                         </Col>
                     }
