@@ -355,7 +355,7 @@ export default () => {
         setSettingShow(false)
         PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus, currentPlaylistThumbVideo, currentPlaylistType)
             .then(response => {
-                console.log('sss',response)
+                // console.log('sss',response)
                 if (response.data.message === 'success') {
                     getAllPlaylists();
                     setCurrentPlaylistId('');
@@ -438,6 +438,7 @@ export default () => {
     }
 
     const savePlaylist = (id, value) => {
+        console.log('savePLaylsit',id, value)
         VideoService.addPlaylistIds(id, value)
     }
 
@@ -645,7 +646,7 @@ const VideoList = (props) => {
                         <Col>
                             {props.playlists.length > 0 &&
                                 <SelectOptions
-                                    label='Playlists'
+                                    label='Playlists X'
                                     id={data.id}
                                     value={data.arr}
                                     items={playlists}

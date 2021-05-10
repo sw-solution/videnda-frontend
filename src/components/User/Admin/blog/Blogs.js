@@ -279,6 +279,7 @@ export default function Blogs() {
     }
 
     const updateBlogPublicPlaylist = (id, value) => {
+        
         if( value )
             setBlogPublicPlaylist(value)
         else
@@ -450,6 +451,7 @@ export default function Blogs() {
                                     {row.private_playlists.length}
                                 </TableCell>
                                 <TableCell style={{ width: 160 }} align="center">
+                                    <Button size="sm" variant="primary" block href={'/blog/'+row.id} target="_mew">Open</Button>
                                     <Button size='sm' variant='primary' block onClick={() => editBlog(row.id)}>Edit</Button>
                                     <Button size='sm' variant='danger' block onClick={() => removeBlog(row.id)}>Delete</Button>
                                 </TableCell>

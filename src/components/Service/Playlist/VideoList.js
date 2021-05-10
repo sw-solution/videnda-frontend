@@ -82,34 +82,38 @@ export default (props) => {
 
     const getAllVideos = () => {
         if (playlistId != null)
-        PlaylistService.getPublicPlaylist(playlistId)
-        .then(async response => {            
-            console.log(playlistId)
-                if (response.data && response.data.length > 0) {                
+        PlaylistService.getPublicPlaylistType(playlistId)
+        .then(async respon =>{
+            console.log('content_type',respon.data.content_type)
+
+            if(respon.data.content_type=='blog'){
+                PlaylistService.getBlogPlaylist(playlistId)
+                    .then(async resp=>{
+                        console.log('respBlogPlayst', resp)
+                        setVideoData(resp.data.fileInfos)
+                        setVideoInfos(resp.data.fileInfos);
+                        setContentType('Blog')
+                        const total = Math.ceil(resp.data.fileInfos.length / itemsPerPage);
+                        setTotalPages(total);
+                    })
+            }
+            else if(respon.data.content_type=='video'){
+                PlaylistService.getPublicPlaylist(playlistId)
+                .then(async response => {            
                     setVideoData(response.data)
                     setVideoInfos(response.data);                    
                     const total = Math.ceil(response.data.length / itemsPerPage);
-                    setTotalPages(total);
-                }else{
-                    PlaylistService.getBlogPlaylist(playlistId)
-                    .then(async resp=>{
-                        console.log('resp', resp)
-                        setVideoData(resp.data)
-                        setVideoInfos(resp.data);
-                        setContentType('Blog')
-                        const total = Math.ceil(resp.data.length / itemsPerPage);
-                        setTotalPages(total);
-                    })
-                
-                    }
-                }).catch(error => {
-                    console.log(error.response)
+                    setTotalPages(total);                
+                })
+            }
 
+        }).catch(error => {
+            console.log('error', error)
                     if ( error.response.status == 401 )
                         history.push("/signin");
                     else if ( error.response.status == 403 || error.response.status == 404 )
-                        history.push("/404");
-                })
+                        history.push("/404");         
+        })
     }
 
     const handleChangePageNumber = (pagenum) => {

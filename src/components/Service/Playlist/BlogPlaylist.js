@@ -116,8 +116,7 @@ const SettingDialog = (props) => {
                         </Select>
                     </Col>
 
-                    <Col md={12}>
-                    
+                    <Col md={12}>                    
                         <Select className="mr-4 mt-4"
                             style={{ width: "100%" }}
                             value={props.currentPlaylistThumbVideo}
@@ -125,9 +124,10 @@ const SettingDialog = (props) => {
                         >
                             <MenuItem value="0" disabled> Choose a item for thumbnail </MenuItem>
                             { props.videoInfos.map((item, index) => {
-                                console.log(index, item)
+                                {/* console.log(index, item) */}
                                 return (
-                                    <MenuItem key={index} value={item.id}> { item.title } </MenuItem>
+                                    <MenuItem key={index} value={item.id}> { item.title }
+                                     </MenuItem>
                                 )}
                             )}
                         </Select>
@@ -207,7 +207,7 @@ export default () => {
     const getAllPlaylists = () => {
         PlaylistService.getAllBlogPlaylist()
             .then(async response => {
-                console.log(response.data)
+                // console.log(response.data)
                 if (response.data && response.data.length > 0) {
                     setPlaylistData(response.data);
                     setPlaylists(response.data);
@@ -315,37 +315,37 @@ export default () => {
         setCurrentPlaylistId(item.playlist_id);
         setCurrentPlaylistTitle(item.playlist_title);
         setCurrentPlaylistStatus(item.playlist_status);
-        setCurrentPlaylistThumbVideo(item.feature_image);
+        setCurrentPlaylistThumbVideo(item.id);
         setCurrentPlaylistType(item.type);
         setCurrentPlaylistContentType(item.content_type);
 
 
-        console.log('item.playlist_id', item.playlist_id)
+        // console.log('item.playlist_id', item.playlist_id)
         
         PlaylistService.getBlogPlaylist(item.playlist_id)
         .then(async response => {
-                console.log('response', response)
-                if (response.data && response.data.length > 0) {
-
-                    const res = response.data;
+            if (response.data && response.data.fileInfos.length > 0) {
+                
+                // console.log('response', response.data.fileInfos, response.data.thumb_video)
+                    const res = response.data.fileInfos;
 
                     for (const key in res) {
                         const blogId = res[key].id;
-                        console.log('blogId', blogId)
+                        // console.log('blogId', blogId)
                         const result = await BlogService.getPlaylistIds(blogId);
                         res[key].arr = result.data.playlists;
                     }
 
-                    setVideoData(res)
-
+                    setVideoData(response.data.thumb_video)
+                    setCurrentPlaylistThumbVideo(response.data.thumb_video)
                     // setVideoData(response.data);
-                    setVideoInfos(response.data);
+                    setVideoInfos(response.data.fileInfos);
 
                     const total = Math.ceil(response.data.length / itemsPerPage);
                     setTotalPages(total);
-                    console.log('cc', res, response.data,  videoInfos, videoData)
+                    // console.log('important thing here', response.data.fileInfos, response.data.thumb_video,  videoInfos, videoData, currentPlaylistThumbVideo)
                 } else {
-                    console.log('ccd', videoInfos)
+                    // console.log('ccd', videoInfos)
                     setVideoInfos([]);
                     
                 }
@@ -377,7 +377,9 @@ export default () => {
                     setCurrentPlaylistId('');
                     setCurrentPlaylistTitle('');
                     setCurrentPlaylistStatus('');
-                    setCurrentPlaylistThumbVideo(0);
+                    setCurrentPlaylistThumbVideo(response.data.data.thumb_video);
+
+                    // console.log('changePlaylist',response, currentPlaylistThumbVideo)
                 }
             })
     }
@@ -454,7 +456,9 @@ export default () => {
     }
 
     const savePlaylist = (id, value) => {
-        VideoService.addPlaylistIds(id, value)
+        // console.log('savePlaylist',id, value)
+        // VideoService.addPlaylistIds(id, value)
+        BlogService.addPlaylistIds(id, value)
     }
 
     const classes = useStyles();
@@ -741,7 +745,7 @@ const VideoList = (props) => {
                         ),
                     }}
                 />
-                <h3 className="card-header">List of Blogs</h3>
+                <h3 className="card-header">List of Blogs </h3>
                 <ListGroup variant="flush">
                     {props.videoInfos
                         && (props.videoInfos.map((video, index) => {                           

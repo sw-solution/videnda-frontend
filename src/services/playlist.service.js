@@ -56,6 +56,10 @@ class PlaylistService {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${PLAYLIST_API_URL}getPublicPlaylist?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
   }
+  getPublicPlaylistType(playlist_id) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.get(`${PLAYLIST_API_URL}getPublicPlaylistType?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
+  }
 }
 
 export default new PlaylistService();

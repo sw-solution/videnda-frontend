@@ -88,6 +88,12 @@ class BlogService {
     return thumb_image();
   }
 
+  addPlaylistIds(video_id, playlist_ids) {
+    console.log('VID &PIDS',video_id, playlist_ids)
+    const currentUser = Auth.getCurrentUser();
+    return axios.post(`${blog_API_URL}addPlaylistIds?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`, playlist_ids);
+  }
+
   getPlaylistIds(blogId) {
     const currentUser = Auth.getCurrentUser();
     return axios.post(`${blog_API_URL}getPlaylistIds?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&blogId=${blogId}`);
