@@ -115,7 +115,7 @@ const BlogModal = (props) => {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Create Blog
+                    Blog Information
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -164,7 +164,7 @@ const BlogModal = (props) => {
                                 value={props.blogPublicPlaylist}
                                 items={props.publicPlaylists}
                                 onSave={props.updateBlogPublicPlaylist}
-                                multiple={false}
+                                multiple={true}
                             />
                         </Col>
                     }
