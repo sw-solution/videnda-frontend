@@ -16,6 +16,7 @@ import { useHistory } from "react-router-dom";
 import VideoPlayer from '../Video/VideoPlayer';
 import Alert from '@material-ui/lab/Alert';
 import MButton from '@material-ui/core/Button';
+import AuthService from "../../../services/auth.service";
 
 import {
     Image,
@@ -71,7 +72,7 @@ export default (props) => {
 
     const [endMarker, setEndMarker] = useState(0);
     const [skipAtEndMarker, setSkipAtEndMarker] = useState(0);
-
+    
 
     let history = useHistory();
 
@@ -84,12 +85,20 @@ export default (props) => {
 
     const getAllVideos = () => {
         console.log('getAllVideos START', playlistId);
-        if (playlistId != null)
+        let loggedIn
+        const user = AuthService.getCurrentUser();
+        // console.log(user);
+        if(user) {
+            loggedIn=1
+        }else{
+            loggedIn=0
+
+        }
             PlaylistService.getPlaylistType(playlistId)
                 .then(async response => {
                     console.log('content_type', response.data)
                     if (response.data == 'blog') {
-                        PlaylistService.getPublicBlogPlaylist(playlistId)
+                        PlaylistService.getPublicBlogPlaylist(playlistId, loggedIn)
                             .then(async resp => {
                                 console.log('respBlogPlayst', resp)
                                 setVideoData(resp.data)

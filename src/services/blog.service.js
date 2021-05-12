@@ -8,7 +8,7 @@ const blog_API_URL = `${BASE_API_URL}blog/`
 
 class BlogService {
   
-  createBlog(title, description, content, feature_image, playlist_ids) {
+  createBlog(title, description, content, feature_image, playlist_ids, blogStatus) {
     const currentUser = Auth.getCurrentUser();
     console.log('playlist_ids 77', playlist_ids)
     return axios.post(`${blog_API_URL}createBlog`, {
@@ -18,11 +18,12 @@ class BlogService {
       description, 
       content, 
       feature_image, 
-      playlist_ids
+      playlist_ids, 
+      blogStatus
     })
   }
 
-  updateBlog(id, title, description, content, feature_image, playlist_ids) {
+  updateBlog(id, title, description, content, feature_image, playlist_ids, blogStatus) {
 
     console.log('playlist_ids upBlog', playlist_ids)
     const currentUser = Auth.getCurrentUser();
@@ -34,7 +35,8 @@ class BlogService {
       description, 
       content, 
       feature_image, 
-      playlist_ids
+      playlist_ids,
+      blogStatus
     })
   }
 
