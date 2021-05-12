@@ -8,9 +8,9 @@ const PLAYLIST_API_URL = `${BASE_API_URL}`
 
 class PlaylistService {
   
-  addPlaylist(playlist_title, playlist_status) {
+  addPlaylist(playlist_title, playlist_status, content_type='video') {
     const currentUser = Auth.getCurrentUser();
-    return axios.post(`${PLAYLIST_API_URL}addPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_title=${playlist_title}&playlist_status=${playlist_status}`);
+    return axios.post(`${PLAYLIST_API_URL}addPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_title=${playlist_title}&playlist_status=${playlist_status}&content_type=${content_type}`);
   }
 
   addHistory(video_id) {
@@ -28,9 +28,9 @@ class PlaylistService {
     return axios.post(`${PLAYLIST_API_URL}removePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
   }
 
-  changePlaylist(id, currentPlaylistTitle, currentPlaylistStatus, thumb_video, type) {
+  changePlaylist(id, currentPlaylistTitle, currentPlaylistStatus, thumb_video, type, content_type='video') {
     const currentUser = Auth.getCurrentUser();
-    return axios.post(`${PLAYLIST_API_URL}changePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&currentPlaylistTitle=${currentPlaylistTitle}&currentPlaylistStatus=${currentPlaylistStatus}&thumb_video=${thumb_video}&type=${type}`);
+    return axios.post(`${PLAYLIST_API_URL}changePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&currentPlaylistTitle=${currentPlaylistTitle}&currentPlaylistStatus=${currentPlaylistStatus}&thumb_video=${thumb_video}&type=${type}&content_type=${content_type}`);
   }
 
   getAllPlaylist() {
@@ -38,14 +38,27 @@ class PlaylistService {
     return axios.get(`${PLAYLIST_API_URL}getAllPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}`);
   }
 
+  getAllBlogPlaylist() {
+    const currentUser = Auth.getCurrentUser();
+    return axios.get(`${PLAYLIST_API_URL}getAllBlogPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}`);
+  }
+
   getPlaylist(playlist_id) {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${PLAYLIST_API_URL}getPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
+  }
+  getBlogPlaylist(playlist_id) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.get(`${PLAYLIST_API_URL}getBlogPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
   }
 
   getPublicPlaylist(playlist_id) {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${PLAYLIST_API_URL}getPublicPlaylist?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
+  }
+  getPublicPlaylistType(playlist_id) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.get(`${PLAYLIST_API_URL}getPublicPlaylistType?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
   }
 }
 

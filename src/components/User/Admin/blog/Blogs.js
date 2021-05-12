@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -18,7 +22,7 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import SelectOptions from '../../Common/SelectOptions';
+import SelectOptions from '../../../Common/SelectOptions';
 
 import {
   Row,
@@ -28,10 +32,11 @@ import {
   Modal,
 } from 'react-bootstrap';
 
-import UserService from '../../../services/user.service';
-import PlaylistService from '../../../services/playlist.service';
-import CategoryService from '../../../services/category.service';
-import AppLayout from '../../../layouts/App';
+import UserService from '../../../../services/user.service';
+import PlaylistService from '../../../../services/playlist.service';
+
+import BlogService from '../../../../services/blog.service';
+import AppLayout from '../../../../layouts/App';
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -98,7 +103,8 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-const CategoryModal = (props) => {
+const BlogModal = (props) => {
+    console.log(props)
     return (
         <Modal
             show={props.show}
@@ -109,41 +115,67 @@ const CategoryModal = (props) => {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Category Information
+                    Blog Information
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Row>
                     <Col md={12}>
-                        <TextField placeholder="Name" fullWidth value={props.title} onChange={ (e) => props.setCategoryTitle(e.target.value) } />
+                        <TextField placeholder="Title" fullWidth value={props.title} onChange={ (e) => props.setBlogTitle(e.target.value) } />
                     </Col>
                     <Col md={12} style={{marginTop: 15}}>
-                        <TextField placeholder="Description" multiline fullWidth rows={4} value={props.description} onChange={ (e) => props.setCategoryDescription(e.target.value) } />
+                        <TextField placeholder="Description" multiline fullWidth rows={4} value={props.description} onChange={ (e) => props.setBlogDescription(e.target.value) } />
                     </Col>
                     <Col md={12} style={{marginTop: 15}}>
-                        <label> Thumbnail:&nbsp;&nbsp; </label>
-                        <input type="file" accept="image/*" onChange={ (e) => props.setCategoryThumb(e.target.files[0]) } />
+                        <TextField placeholder="Content" multiline fullWidth rows={4} value={props.content} onChange={ (e) => props.setBlogContent(e.target.value) } />
+
+        
+                      {/* <CKEditor
+                    editor={ ClassicEditor }
+                    data={props.content}
+                    onReady={ editor => {
+                        // You can store the "editor" and use when it is needed.
+                        console.log( 'Editor is ready to use!', editor );
+                    } }
+                    onChange={ ( event, editor ) => {
+                        const data = editor.getData();
+                        console.log( { event, editor, data } );
+                        props.setBlogContent(data)
+                    } }
+                    onBlur={ ( event, editor ) => {
+                        console.log( 'Blur.', editor );
+                    } }
+                    onFocus={ ( event, editor ) => {
+                        console.log( 'Focus.', editor );
+                    } }
+                /> */}
                     </Col>
+                    <Col md={12} style={{marginTop: 15}}>
+                        <label> Fetaure Image:&nbsp;&nbsp; </label>
+                        <input type="file" accept="image/*" onChange={ (e) => props.setBlogFeatureImage(e.target.files[0]) } />
+                        {props.blogFeatureImage && <img src={props.blogFeatureImage} width="100%" style={{objectFit: 'cover'}} /> }
+                    </Col>
+                    
                     {props.publicPlaylists &&
                         <Col md={6} style={{marginTop: 15}}>
                             <SelectOptions
                                 label='Public Playlists'
                                 id={props.id}
-                                value={props.categoryPublicPlaylist}
+                                value={props.blogPublicPlaylist}
                                 items={props.publicPlaylists}
-                                onSave={props.updateCategoryPublicPlaylist}
+                                onSave={props.updateBlogPublicPlaylist}
                                 multiple={false}
                             />
                         </Col>
                     }
-                    {props.privatePlaylists.length > 0 &&
+                    {props.privatePlaylists &&
                         <Col md={6} style={{marginTop: 15}}>
                             <SelectOptions
                                 label='Private Playlists'
                                 id={props.id}
-                                value={props.categoryPrivatePlaylists}
+                                value={props.blogPrivatePlaylists}
                                 items={props.privatePlaylists}
-                                onSave={props.updateCategoryPrivatePlaylists}
+                                onSave={props.updateBlogPrivatePlaylists}
                                 multiple={true}
                             />
                         </Col>
@@ -169,7 +201,7 @@ const useStyles2 = makeStyles({
   }
 });
 
-export default function CategoryManagement() {
+export default function Blogs() {
     const classes = useStyles2();
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -178,126 +210,154 @@ export default function CategoryManagement() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [searchString, setSearchString] = useState('');
     const [errorText, setErrorText] = useState('');
-    const [marketingPublicPlaylists, setMarketingPublicPlaylists] = useState([]);
-    const [marketingPrivatePlaylists, setMarketingPrivatePlaylists] = useState([]);
+    const [blogPublicPlaylists, setBlogPublicPlaylists] = useState([]);
+    const [blogPrivatePlaylists, setBlogPrivatePlaylists] = useState([]);
         
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showBlogModal, setShowBlogModal] = useState(false);
 
-    // for category modal
-    const [categoryId, setCategoryId] = useState('');
-    const [categoryTitle, setCategoryTitle] = useState('');
-    const [categoryDescription, setCategoryDescription] = useState('');
-    const [categoryThumb, setCategoryThumb] = useState(null);
-    const [categoryPublicPlaylist, setCategoryPublicPlaylist] = useState();
-    const [categoryPrivatePlaylists, setCategoryPrivatePlaylists] = useState([]);
+
+    // for Blog modal
+    const [blogId, setBlogId] = useState('');
+    const [blogTitle, setBlogTitle] = useState('');
+    const [blogDescription, setBlogDescription] = useState('');
+    const [blogContent, setBlogContent] = useState('');
+    const [blogFeatureImage, setBlogFeatureImage] = useState(null);    
+    const [blogPublicPlaylist, setBlogPublicPlaylist] = useState();
+    const [blogPrivatePlaylist, setBlogPrivatePlaylist] = useState([]);
 
     useEffect(() => {
         if (!isLoaded) {
-            getAllCategory();
+            getAllBlog();
             getAllPlaylists();
             setIsLoaded(true)
         }
     })
     
-    const getAllCategory = () => {
-        CategoryService.getAllCategory()
+    const getAllBlog = () => {
+        console.log('preGetAllBlog')
+        BlogService.getAllBlogList()
             .then(result => {
+                console.log('AllBlog', result.data)
                 setRows(result.data)
                 setData(result.data)
             })
     }
 
     const getAllPlaylists = () => {
-        PlaylistService.getAllPlaylist()
+        PlaylistService.getAllBlogPlaylist()
             .then(async response => {
+                console.log('GetPlaylist',response.data)
                 if (response.data && response.data.length > 0) {
                     let privatePlaylists = [];
                     let publicPlaylists = [];
                     response.data.map(item => {
-                        if( item.type == 'marketing') {
+                        if( item.content_type == 'blog') {
                             let obj = {id: item.id, name: item.playlist_title};
                             item.playlist_status == 0 && privatePlaylists.push(obj) || publicPlaylists.push(obj);
                         }
                     })
 
-                    setMarketingPublicPlaylists(publicPlaylists);
-                    setMarketingPrivatePlaylists(privatePlaylists);
+                    setBlogPublicPlaylists(publicPlaylists);
+                    setBlogPrivatePlaylists(privatePlaylists);
+                    console.log(publicPlaylists, 'Playlists', privatePlaylists)
                 }
             })
     }
 
-    const resetCategoryData = () => {
-        setCategoryId('');
-        setCategoryTitle('');
-        setCategoryDescription('');
-        setCategoryThumb(null);
-        setCategoryPublicPlaylist();
-        setCategoryPrivatePlaylists([]);
+    const resetBlogData = () => {
+        
+        setBlogId('')
+        setBlogTitle('')
+        setBlogDescription('')
+        setBlogContent('')
+        setBlogFeatureImage(null)
+
+        setBlogPublicPlaylist([])
+        setBlogPrivatePlaylist([])
     }
 
-    const updateCategoryPublicPlaylist = (id, value) => {
+    const updateBlogPublicPlaylist = (id, value) => {
+        
         if( value )
-            setCategoryPublicPlaylist(value)
+            setBlogPublicPlaylist(value)
         else
-            setCategoryPublicPlaylist()
+            setBlogPublicPlaylist()
     }
 
-    const updateCategoryPrivatePlaylists = (id, value) => {
-        setCategoryPrivatePlaylists(value)
+    const updateBlogPrivatePlaylists = (id, value) => {
+        setBlogPrivatePlaylists(value)
     }
 
-    const saveCategory = async () => {
+    const saveBlog = async () => {
         setRows([])
         setData([])
 
-        let thumb = '';
-        if( categoryThumb ) {
-            thumb = await CategoryService.uploadThumbnail(categoryThumb);
+        let feature_image = '';
+        if( blogFeatureImage ) {
+            console.log(blogFeatureImage)
+            feature_image = await BlogService.uploadThumbnail(blogFeatureImage);
         }
-
+        console.log(blogFeatureImage)
+        console.log(feature_image)
         let playlists = [];
-        if( categoryPublicPlaylist > 0 )
-            playlists = [categoryPublicPlaylist, ...categoryPrivatePlaylists];
-        else
-            playlists = [...categoryPrivatePlaylists];
 
-        if( categoryId ) {
-            await CategoryService.updateCategory(categoryId, categoryTitle, categoryDescription, thumb, playlists)
+        blogPublicPlaylists.map(plist=>{
+            playlists.push(plist.id)
+        })
+        blogPrivatePlaylists.map(pplist=>{
+            playlists.push(pplist.id)
+        })
+        // if( blogPublicPlaylists > 0 )
+            // playlists = [blogPublicPlaylists, ...blogPrivatePlaylists];
+        // else
+        //     playlists = [...blogPrivatePlaylists];
+
+        console.log('playlists 889', playlists)
+
+        if( blogId ) {
+            await BlogService.updateBlog(blogId, blogTitle, blogDescription, blogContent, feature_image, playlists)
         } else {
-            await CategoryService.addCategory(categoryTitle, categoryDescription, thumb, playlists)
+            await BlogService.createBlog(blogTitle, blogDescription, blogContent, feature_image, playlists )
         }
 
-        setShowCategoryModal(false)
-        resetCategoryData()
-        getAllCategory()
+        setShowBlogModal(false)
+        resetBlogData()
+        getAllBlog()
     }
 
-    const editCategory = (id) => {
-        resetCategoryData()
+    const editBlog = (id) => {
+        console.log(id)
+        console.log(rows)
+        resetBlogData()
 
-        const category = rows.filter(item => item.category_id == id)[0];
-        
-        setCategoryId(category.category_id);
-        setCategoryTitle(category.title);
-        setCategoryDescription(category.description);
-        setCategoryThumb(null);
-        setCategoryPublicPlaylist(category.public_playlists && category.public_playlists.length && category.public_playlists[0]);
-        setCategoryPrivatePlaylists(category.private_playlists);
+        const blog = rows.filter(item => item.id == id)[0];
+        console.log('blog', blog)
 
-        setShowCategoryModal(true)
+        setBlogId(blog.id)
+        setBlogTitle(blog.title)
+        setBlogDescription(blog.description)
+        setBlogContent(blog.content)
+        setBlogFeatureImage(null)
+        setBlogPublicPlaylist(blog.public_playlists && blog.public_playlists.length && blog.public_playlists[0])
+        setBlogPrivatePlaylists(blog.private_playlists)
+
+        setShowBlogModal(true)
+
+        console.log('here')
     }
 
-    const removeCategory = (id) => {
+    const removeBlog = (id) => {
+        console.log('id', id)
         if (window.confirm('Are you sure?')) {
             setRows([])
             setData([])
             
-            CategoryService.removeCategory(id)
+            BlogService.removeBlog(id)
             .then(response => {
                 if( response.data.message == 'success')
-                    getAllCategory()
+                    getAllBlog()
             }).catch((err) => {
                 const resMessage = (
                     err.response &&
@@ -334,15 +394,15 @@ export default function CategoryManagement() {
             }
             <Row className='mt-5'>
                 <Col md={9}>
-                <Button size='sm' onClick={() => { resetCategoryData(); setShowCategoryModal(true); }}>
-                    Add Category
+                <Button size='sm' onClick={() => { resetBlogData(); setShowBlogModal(true); }}>
+                    Add Blog
                 </Button>
                 </Col>
                 <Col md={3}>
                 <TextField
                     className={classes.pasteTextField}
                     id="input-with-icon-textfield"
-                    placeholder="Search Category"
+                    placeholder="Search Blog"
                     onChange={(e) => setSearchString(e.target.value)}
                     onKeyDown={handleSearch}
                     InputProps={{
@@ -373,10 +433,10 @@ export default function CategoryManagement() {
                         {(rowsPerPage > 0 ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : rows).map((row, index) => (
                             <TableRow key={row.id}>
                                 <TableCell style={{ width: 50 }} component="th" scope="row" align="center">
-                                    {index + 1}
+                                    {index + 1} 
                                 </TableCell>
                                 <TableCell style={{ width: 150 }} align="center">
-                                    {row.thumb_image && <img src={row.thumb_image} width="100%" style={{objectFit: 'cover'}} /> }
+                                    {row.feature_image && <img src={row.feature_image} width="100%" style={{objectFit: 'cover'}} /> }
                                 </TableCell>
                                 <TableCell style={{ width: 150 }} align="center">
                                     {row.title}
@@ -391,8 +451,9 @@ export default function CategoryManagement() {
                                     {row.private_playlists.length}
                                 </TableCell>
                                 <TableCell style={{ width: 160 }} align="center">
-                                    <Button size='sm' variant='primary' block onClick={() => editCategory(row.category_id)}>Edit</Button>
-                                    <Button size='sm' variant='danger' block onClick={() => removeCategory(row.category_id)}>Delete</Button>
+                                    <Button size="sm" variant="primary" block href={'/blog/'+row.id} target="_mew">Open</Button>
+                                    <Button size='sm' variant='primary' block onClick={() => editBlog(row.id)}>Edit</Button>
+                                    <Button size='sm' variant='danger' block onClick={() => removeBlog(row.id)}>Delete</Button>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -424,22 +485,25 @@ export default function CategoryManagement() {
                 </Table>
             </TableContainer>
             
-            <CategoryModal
-                show={showCategoryModal}
-                onHide={() => setShowCategoryModal(false)}
-                id={ categoryId }
-                title={ categoryTitle }
-                description={ categoryDescription }
-                categoryPublicPlaylist={ categoryPublicPlaylist }
-                categoryPrivatePlaylists={ categoryPrivatePlaylists }
-                publicPlaylists={ marketingPublicPlaylists }
-                privatePlaylists={ marketingPrivatePlaylists }
-                onSave={saveCategory}
-                setCategoryTitle={setCategoryTitle}
-                setCategoryDescription={setCategoryDescription}
-                setCategoryThumb={setCategoryThumb}
-                updateCategoryPublicPlaylist={updateCategoryPublicPlaylist}
-                updateCategoryPrivatePlaylists={updateCategoryPrivatePlaylists}
+            <BlogModal
+                show={showBlogModal}
+                onHide={() => setShowBlogModal(false)}
+                id={ blogId }
+                title={ blogTitle }
+                description={ blogDescription }
+                content={ blogContent }
+                blogFeatureImage={blogFeatureImage}                
+                blogPublicPlaylist={ blogPublicPlaylist }
+                blogPrivatePlaylists={ blogPrivatePlaylists }
+                publicPlaylists={ blogPublicPlaylists }
+                privatePlaylists={ blogPrivatePlaylists }
+                onSave={saveBlog}
+                setBlogTitle={setBlogTitle}
+                setBlogDescription={setBlogDescription}
+                setBlogContent={setBlogContent}
+                setBlogFeatureImage={setBlogFeatureImage}
+                updateBlogPublicPlaylist={updateBlogPublicPlaylist}
+                updateBlogPrivatePlaylists={updateBlogPrivatePlaylists}
             />
         </AppLayout>
     );

@@ -25,7 +25,6 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
 import GlobalData from '../../../tools/GlobalData';
 import SelectOptions from '../../Common/SelectOptions';
-import VideoPlayer from '../Video/VideoPlayer';
 import EditDialog from '../Video/EditDialog';
 
 import {
@@ -38,7 +37,8 @@ import {
     Media,
 } from 'react-bootstrap';
 
-import VideoService from '../../../services/video.service';
+// import VideoService from '../../../services/video.service';
+import BlogService from '../../../services/blog.service';
 import PlaylistService from '../../../services/playlist.service';
 import { LinearProgress, Paper } from '@material-ui/core';
 
@@ -67,8 +67,8 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const getVideoId = (url) => {
-    return url.split("?v=")[1];
+const getblogId = (url) => {
+    // return url.split("?v=")[1];
 }
 
 const SettingDialog = (props) => {
@@ -115,20 +115,23 @@ const SettingDialog = (props) => {
                         </Select>
                     </Col>
 
-                    <Col md={12}>
+                    <Col md={12}>                    
                         <Select className="mr-4 mt-4"
                             style={{ width: "100%" }}
-                            value={props.currentPlaylistThumbVideo}
-                            onChange={(e) => props.setCurrentPlaylistThumbVideo(e.target.value)}
+                            value={props.currentPlaylistThumbBlog}
+                            onChange={(e) => props.setCurrentPlaylistThumbBlog(e.target.value)}
                         >
-                            <MenuItem value="0" disabled> Choose a video for thumbnail </MenuItem>
-                            { props.videoInfos.map((item, index) => {
+                            <MenuItem value="0" disabled> Choose a item for thumbnail </MenuItem>
+                            { props.blogInfos.map((item, index) => {
+                                {/* console.log(index, item) */}
                                 return (
-                                    <MenuItem key={index} value={item.id}> { item.manual_title || item.meta_title } </MenuItem>
+                                    <MenuItem key={index} value={item.id}> { item.title }
+                                     </MenuItem>
                                 )}
                             )}
                         </Select>
                     </Col>
+               
                     
                     {props.isAdmin &&
                         <Col md={6}>
@@ -144,7 +147,9 @@ const SettingDialog = (props) => {
                                 <MenuItem value='marketing'>Marketing</MenuItem>
                             </Select>
                         </Col>
+                        
                     }
+              
                 </Row>
             </Modal.Body>
             <Modal.Footer>
@@ -166,8 +171,8 @@ export default () => {
     const [alertVisible, setAlertVisible] = useState(false);
     const [expanded, setExpanded] = useState([]);
     const [progressVisible, setProgressVisible] = useState(false);
-    const [videoData, setVideoData] = useState([]);
-    const [videoInfos, setVideoInfos] = useState([]);
+    const [blogData, setBlogData] = useState([]);
+    const [blogInfos, setBlogInfos] = useState([]);
     const [modalShow, setModalShow] = useState(false);
     const [settingShow, setSettingShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
@@ -179,13 +184,14 @@ export default () => {
     const [playlistData, setPlaylistData] = useState([]);
     const [currentPlaylistTitle, setCurrentPlaylistTitle] = useState('');
     const [currentPlaylistStatus, setCurrentPlaylistStatus] = useState('');
-    const [currentPlaylistThumbVideo, setCurrentPlaylistThumbVideo] = useState(0);
+    const [currentPlaylistThumbBlog, setCurrentPlaylistThumbBlog] = useState(0);
     const [currentPlaylistType, setCurrentPlaylistType] = useState(0);
+    const [currentPlaylistContentType, setCurrentPlaylistContentType] = useState(0);
     
     const [playlists, setPlaylists] = useState([]);
-    const [videoId, setVideoId] = useState(null);
+    const [blogId, setBlogId] = useState(null);
     // const [playlistId, setPlaylistId] = useState(null);
-    const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
+    const [currentBlogNumber, setCurrentBlogNumber] = useState(1);
     const [editShow, setEditShow] = useState(false);
     const [manualTitle, setManualTitle] = useState(undefined);
     const [manualDescription, setManualDescription] = useState(undefined);
@@ -198,8 +204,9 @@ export default () => {
     }, [])
 
     const getAllPlaylists = () => {
-        PlaylistService.getAllPlaylist()
+        PlaylistService.getAllBlogPlaylist()
             .then(async response => {
+                // console.log(response.data)
                 if (response.data && response.data.length > 0) {
                     setPlaylistData(response.data);
                     setPlaylists(response.data);
@@ -210,7 +217,7 @@ export default () => {
 
     // Add playlist
     const upload = () => {
-        PlaylistService.addPlaylist(playlistTitle, playlistStatus)
+        PlaylistService.addPlaylist(playlistTitle, playlistStatus, 'blog')
             .then(response => {
                 if (response.data.message === 'success') {
                     getAllPlaylists();
@@ -227,8 +234,8 @@ export default () => {
     const handleChangeKeyword = (key) => {
         const keyword = key.trim().toLowerCase();
         const nodeId = selected;
-        let data = videoData.filter(item => {
-            let fileName = item.meta_keyword + item.meta_description + item.meta_title + getVideoId(item.video_id);
+        let data = blogData.filter(item => {
+            let fileName = item.title + item.description + item.content;
             fileName = fileName ? fileName.trim().toLowerCase() : '';
 
             if (fileName.includes(keyword)) {
@@ -239,9 +246,9 @@ export default () => {
         });
 
         if (keyword == "") {
-            setVideoInfos(videoData);
+            setBlogInfos(blogData);
         } else {
-            setVideoInfos(data);
+            setBlogInfos(data);
         }
 
         const total = Math.ceil(data.length / itemsPerPage);
@@ -258,36 +265,7 @@ export default () => {
         }
     }
 
-    // Remove one video item
-    const handleRemoveItem = (id) => {
-        if (window.confirm('Are you sure?')) {
-            VideoService.removeVideo(id)
-                .then(response => {
-                    if (response.data.message === "success") {
-                        let arr = [...videoInfos];
-                        arr = arr.filter(item => item.id !== id);
-                        setVideoInfos(arr);
-                    }
-                }).catch((err) => {
-                    const resMessage = (
-                        err.response &&
-                        err.response.data &&
-                        err.response.data.message
-                    ) || err.toString();
 
-                    setMessage(resMessage);
-                });
-        }
-    }
-
-    // Play one video
-    const handlePlayVideo = (video_url, meta_title, meta_description, video_id) => {
-        setModalShow(true);
-        setPlayUrl(video_url);
-        setMetaTitle(meta_title);
-        setMetaDescription(meta_description);
-        setVideoId(video_id);
-    }
 
     // playlist
     const handlePlaylist = (e, video_id) => {
@@ -299,7 +277,7 @@ export default () => {
             playlist_id = selectedPlaylist.playlist_id;
         }
 
-        VideoService.changeVideoGroup(video_id, playlist_id);
+        // VideoService.changeVideoGroup(video_id, playlist_id);
         window.location.reload();
     }
 
@@ -307,30 +285,37 @@ export default () => {
         setCurrentPlaylistId(item.playlist_id);
         setCurrentPlaylistTitle(item.playlist_title);
         setCurrentPlaylistStatus(item.playlist_status);
-        setCurrentPlaylistThumbVideo(item.thumb_video);
+        setCurrentPlaylistThumbBlog(item.id);
         setCurrentPlaylistType(item.type);
+        setCurrentPlaylistContentType(item.content_type);
 
-        PlaylistService.getPlaylist(item.playlist_id)
-            .then(async response => {
-                if (response.data && response.data.length > 0) {
 
-                    const res = response.data;
+        
+        PlaylistService.getBlogPlaylist(item.playlist_id)
+        .then(async response => {
+            if (response.data && response.data.fileInfos.length > 0) {
+                
+                    const res = response.data.fileInfos;
 
                     for (const key in res) {
-                        const videoId = res[key].id;
-                        const result = await VideoService.getPlaylistIds(videoId);
+                        const blogId = res[key].id;
+                        // console.log('blogId', blogId)
+                        const result = await BlogService.getPlaylistIds(blogId);
                         res[key].arr = result.data.playlists;
                     }
 
-                    setVideoData(res)
 
-                    // setVideoData(response.data);
-                    setVideoInfos(response.data);
+                    setCurrentPlaylistThumbBlog(response.data.thumb_video)
+                    setBlogData(response.data.fileInfos);
+                    setBlogInfos(response.data.fileInfos);
 
                     const total = Math.ceil(response.data.length / itemsPerPage);
                     setTotalPages(total);
+
                 } else {
-                    setVideoInfos([]);
+
+                    setBlogInfos([]);
+                    
                 }
             })
     }
@@ -353,15 +338,16 @@ export default () => {
     // change
     const handleSettingSave = () => {
         setSettingShow(false)
-        PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus, currentPlaylistThumbVideo, currentPlaylistType)
+        PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus, currentPlaylistThumbBlog, currentPlaylistType, currentPlaylistContentType)
             .then(response => {
-                // console.log('sss',response)
                 if (response.data.message === 'success') {
                     getAllPlaylists();
                     setCurrentPlaylistId('');
                     setCurrentPlaylistTitle('');
                     setCurrentPlaylistStatus('');
-                    setCurrentPlaylistThumbVideo(0);
+                    setCurrentPlaylistThumbBlog(response.data.data.thumb_video);
+
+                    // console.log('changePlaylist',response, currentPlaylistThumbBlog)
                 }
             })
     }
@@ -372,74 +358,25 @@ export default () => {
         return " [" + meta + "]";
     }
 
-    const onNextVideo = () => {
-        const index = videoData.findIndex(item => item.id == videoId);
-        if (index >= videoData.length - 1) {
-            return;
-        }
-        const nextUrl = videoData[index + 1].video_id;
-        setVideoId(videoData[index + 1].id);
-        setPlayUrl(nextUrl);
-        setMetaTitle(videoData[index + 1].meta_title + meta_restriction_age_str(videoData[index + 1].meta_restriction_age))
-        setMetaDescription(videoData[index + 1].meta_description)
-        setCurrentVideoNumber(getCurrentVideoNumber() + 1)
-    }
 
-    const onPreviousVideo = () => {
-        const index = videoData.findIndex(item => item.id == videoId);
-        if (index <= 0) {
-            return;
-        }
-        const prevUrl = videoData[index - 1].video_id;
-        setVideoId(videoData[index - 1].id);
-        setPlayUrl(prevUrl);
-        setMetaTitle(videoData[index - 1].meta_title + meta_restriction_age_str(videoData[index - 1].meta_restriction_age))
-        setMetaDescription(videoData[index - 1].meta_description)
-        setCurrentVideoNumber(getCurrentVideoNumber() - 1)
-    }
-
-    const onOpenSourceUrl = () => {
-        //beep();
-        //Pause curent video before launching a new one
-        const index = videoData.findIndex(item => item.id == videoId);
-        const nextUrl = videoData[index].video_id;
-        window.open(nextUrl, '_blank');
-    }
-
-    const getCurrentVideoNumber = () => {
-        return videoData.findIndex(item => item.id == videoId) + 1
-    }
-
-    const itemClick = (video_id, videoId) => {
-        setPlayUrl(video_id);
-        setVideoId(videoId);
-        setMetaTitle(videoData.find(item => item.id == videoId).meta_title);
-        setMetaDescription(videoData.find(item => item.id == videoId).meta_description);
-    }
+  
 
 
     // edit save
     const onSave = () => {
         setEditShow(false);
-        VideoService.setManualInfo(videoId, manualTitle, manualDescription);
-        const index = videoData.findIndex(item => item.id == videoId);
-        videoData[index].manual_title = manualTitle;
-        videoData[index].manual_description = manualDescription;
+        // VideoService.setManualInfo(blogId, manualTitle, manualDescription);
+        const index = blogData.findIndex(item => item.id == blogId);
+        blogData[index].manual_title = manualTitle;
+        blogData[index].manual_description = manualDescription;
     }
 
-    const setVideoType = (video_id, type) => {
-        let arr = videoInfos;
-        arr.map((item, index) => {
-            item.id == video_id && (arr[index].type = type);
-        });
-        setVideoInfos(arr);
 
-        VideoService.setVideoType(video_id, type);
-    }
 
     const savePlaylist = (id, value) => {
-        console.log('savePLaylsit',id, value)
-        VideoService.addPlaylistIds(id, value)
+        // console.log('savePlaylist',id, value)
+        // VideoService.addPlaylistIds(id, value)
+        BlogService.addPlaylistIds(id, value)
     }
 
     const classes = useStyles();
@@ -454,7 +391,7 @@ export default () => {
 
     return (
         <AppLayout>
-            <h2 className="mb-3">My Playlists</h2>
+            <h2 className="mb-3">My Blog Playlists</h2>
             <Row className="mb-3">
                 <Col md={4}>
                     <TextField
@@ -535,9 +472,9 @@ export default () => {
                     </List>
                 </Col>
                 <Col md={9}>
-                    {videoInfos &&
+                    {blogInfos &&
                         <VideoList
-                            videoInfos={videoInfos}
+                            blogInfos={blogInfos}
                             totalPages={totalPages}
                             itemsPerPage={itemsPerPage}
                             currentPage={pageNumber}
@@ -545,33 +482,17 @@ export default () => {
                             currentPlaylistId={currentPlaylistId}
                             onChangeKeyword={handleChangeKeyword}
                             onChangePageNumber={handleChangePageNumber}
-                            handleRemoveItem={handleRemoveItem}
-                            handlePlayVideo={handlePlayVideo}
-                            onChangePlaylist={handlePlaylist}
                             setEditShow={setEditShow}
                             setManualTitle={setManualTitle}
                             setManualDescription={setManualDescription}
-                            setVideoId={setVideoId}
+                            setBlogId={setBlogId}
                             savePlaylist={savePlaylist}
-                            setVideoType={setVideoType}
+                            
                         />
                     }
                 </Col>
             </Row>
-            <VideoPlayer
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-                playUrl={playUrl}
-                metaTitle={metaTitle}
-                metaDescription={metaDescription}
-                videoData={videoData}
-                videoId={videoId}
-                onPreviousVideo={onPreviousVideo}
-                onNextVideo={onNextVideo}
-                onOpenSourceUrl={onOpenSourceUrl}
-                currentVideoNumber={currentVideoNumber}
-                itemClick={itemClick}
-            />
+  
             <SettingDialog
                 show={settingShow}
                 onHide={() => setSettingShow(false)}
@@ -581,11 +502,13 @@ export default () => {
                 currentPlaylistTitle={currentPlaylistTitle}
                 currentPlaylistStatus={currentPlaylistStatus}
                 setCurrentPlaylistStatus={setCurrentPlaylistStatus}
-                setCurrentPlaylistThumbVideo={setCurrentPlaylistThumbVideo}
-                currentPlaylistThumbVideo={currentPlaylistThumbVideo}
+                setCurrentPlaylistThumbBlog={setCurrentPlaylistThumbBlog}
+                currentPlaylistThumbBlog={currentPlaylistThumbBlog}
                 setCurrentPlaylistType={setCurrentPlaylistType}
+                setCurrentPlaylistContentType={setCurrentPlaylistContentType}
                 currentPlaylistType={currentPlaylistType}
-                videoInfos={videoInfos}
+                currentPlaylistContentType={currentPlaylistContentType}
+                blogInfos={blogInfos}
                 isAdmin={isAdmin}
             />
             <EditDialog
@@ -616,37 +539,25 @@ const VideoList = (props) => {
     const renderItem = (data) => (
         <ListGroup.Item key={data.id}>
             <Media>
-                <Image thumbnail src={data.meta_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.manual_description || data.meta_description, data.id)} />
+                <Image thumbnail src={data.feature_image} className="mr-3" style={{ cursor: 'pointer' }}  />
                 <Media.Body>
                     <h5><span style={{ color: 'green' }}>{data.manual_title && data.manual_title}</span></h5>
                     <h5><span>{data.meta_title}</span></h5>
-                    <p style={{ marginBottom: "0px" }}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
-                    <p style={{ marginBottom: "2px" }}><span style={{ color: 'green' }}>{data.manual_description && data.manual_description}</span></p>
-                    <p style={{ marginBottom: "2px" }}><span>{data.meta_description}</span></p>
-                    {data.meta_keyword && (
-                        <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
-                    )}
+                    <p style={{ marginBottom: "0px" }}><span>title : </span><code>{data.title}</code></p>
+                    
+                    <p style={{ marginBottom: "2px" }}><span>{data.description}</span></p>
+                 
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
 
                     <Row>
                         <Col className="align-self-end pb-4">
-                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.manual_description || data.meta_description, data.id)}>Play</Button>
-                            <Button variant="info" size="sm" className="mr-2"
-                                onClick={() => {
-                                    props.setManualTitle(data.manual_title ? data.manual_title : data.meta_title);
-                                    props.setManualDescription(data.manual_description ? data.manual_description : data.meta_description);
-                                    props.setEditShow(true);
-                                    props.setVideoId(data.id);
-                                }}
-                            >
-                                Edit
-                            </Button>
-                            <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                        <Button size="sm" variant="primary" block href={'/blog/'+data.id} target="_mew">Open</Button>
+                           
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&
                                 <SelectOptions
-                                    label='Playlists X'
+                                    label='Playlists'
                                     id={data.id}
                                     value={data.arr}
                                     items={playlists}
@@ -654,19 +565,7 @@ const VideoList = (props) => {
                                     multiple={true}
                                 />
                             }
-                            { isAdmin && 
-                                <SelectOptions
-                                    label='Type'
-                                    id={data.id}
-                                    value={data.type}
-                                    items={[
-                                        {id: 'free', name: 'Free'},
-                                        {id: 'pro', name: 'Pro'}
-                                        ]}
-                                    onSave={props.setVideoType}
-                                    multiple={false}
-                                />
-                            }
+                        
                         </Col>
                     </Row>
                 </Media.Body>
@@ -689,7 +588,7 @@ const VideoList = (props) => {
     }
 
     const doSomethingWith = (e) => {
-        if (e.key === 'Enter' || e.keyCode === 13) {
+        if (e.key === 'Enter' || e.keyCode === 13) {            
             props.onChangeKeyword(e.target.value);
         }
     }
@@ -726,12 +625,12 @@ const VideoList = (props) => {
                         ),
                     }}
                 />
-                <h3 className="card-header">List of Videos</h3>
+                <h3 className="card-header">List of Blogs </h3>
                 <ListGroup variant="flush">
-                    {props.videoInfos
-                        && (props.videoInfos.map((video, index) => {
+                    {props.blogInfos
+                        && (props.blogInfos.map((blog, index) => {                           
                             if ((props.currentPage - 1) * props.itemsPerPage <= index && (props.currentPage) * props.itemsPerPage > index) {
-                                return renderItem(video)
+                                return renderItem(blog)
                             } else {
                                 return null
                             }
