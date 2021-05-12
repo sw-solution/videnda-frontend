@@ -47,9 +47,10 @@ class PlaylistService {
     return axios.get(`${PLAYLIST_API_URL}getPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
   }
 
-  getPublicBlogPlaylist(playlist_id) {
+  getPublicBlogPlaylist(playlist_id, loginstatus) {
+    // console.log('loginstatus 11111',  loginstatus)
     const currentUser = Auth.getCurrentUser();
-    return axios.get(`${PLAYLIST_API_URL}getPublicBlogPlaylist?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
+    return axios.get(`${PLAYLIST_API_URL}getPublicBlogPlaylist?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}&loginstatus=${loginstatus}`);
   }
 
   getBlogPlaylist(playlist_id) {

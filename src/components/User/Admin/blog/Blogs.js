@@ -104,7 +104,7 @@ TablePaginationActions.propTypes = {
 };
 
 const BlogModal = (props) => {
-    console.log(props)
+    console.log('propsxy',props)
     return (
         <Modal
             show={props.show}
@@ -130,25 +130,6 @@ const BlogModal = (props) => {
                         <TextField placeholder="Content" multiline fullWidth rows={4} value={props.content} onChange={ (e) => props.setBlogContent(e.target.value) } />
 
         
-                      {/* <CKEditor
-                    editor={ ClassicEditor }
-                    data={props.content}
-                    onReady={ editor => {
-                        // You can store the "editor" and use when it is needed.
-                        console.log( 'Editor is ready to use!', editor );
-                    } }
-                    onChange={ ( event, editor ) => {
-                        const data = editor.getData();
-                        console.log( { event, editor, data } );
-                        props.setBlogContent(data)
-                    } }
-                    onBlur={ ( event, editor ) => {
-                        console.log( 'Blur.', editor );
-                    } }
-                    onFocus={ ( event, editor ) => {
-                        console.log( 'Focus.', editor );
-                    } }
-                /> */}
                     </Col>
                     <Col md={12} style={{marginTop: 15}}>
                         <label> Fetaure Image:&nbsp;&nbsp; </label>
@@ -156,6 +137,18 @@ const BlogModal = (props) => {
                         {props.blogFeatureImage && <img src={props.blogFeatureImage} width="100%" style={{objectFit: 'cover'}} /> }
                     </Col>
                     
+                    {props.blogStatus &&
+                        <Col md={6} className="offset-md-6" style={{marginTop: 15}}>
+                            <SelectOptions
+                                label='Blog Status'
+                                id={props.id}
+                                value={props.blogStatus}
+                                items={props.blogStatusAll}
+                                onSave={props.updateBlogStatus}
+                                multiple={false}
+                            />
+                        </Col>
+                    }
                     {props.publicPlaylists &&
                         <Col md={6} style={{marginTop: 15}}>
                             <SelectOptions
@@ -168,6 +161,7 @@ const BlogModal = (props) => {
                             />
                         </Col>
                     }
+
                     {props.privatePlaylists &&
                         <Col md={6} style={{marginTop: 15}}>
                             <SelectOptions
@@ -212,10 +206,12 @@ export default function Blogs() {
     const [errorText, setErrorText] = useState('');
     const [blogPublicPlaylists, setBlogPublicPlaylists] = useState([]);
     const [blogPrivatePlaylists, setBlogPrivatePlaylists] = useState([]);
-        
+    
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-
+    
     const [showBlogModal, setShowBlogModal] = useState(false);
+    const [blogStatus, setBlogStatus] = useState(1);
+    const [blogStatusAll, setBlogStatusAll] = useState([{id:1, name:'Public'}, {id:2, name:'Private'}]);
 
 
     // for Blog modal
@@ -236,10 +232,10 @@ export default function Blogs() {
     })
     
     const getAllBlog = () => {
-        console.log('preGetAllBlog')
+        // console.log('preGetAllBlog')
         BlogService.getAllBlogList()
             .then(result => {
-                console.log('AllBlog', result.data)
+                // console.log('AllBlog', result.data)
                 setRows(result.data)
                 setData(result.data)
             })
@@ -285,6 +281,11 @@ export default function Blogs() {
         else
             setBlogPublicPlaylist()
     }
+    const updateBlogStatus = (id, value) => {
+        
+        if( value )
+            setBlogStatus(value)        
+    }
 
     const updateBlogPrivatePlaylists = (id, value) => {
         setBlogPrivatePlaylists(value)
@@ -317,9 +318,9 @@ export default function Blogs() {
         console.log('playlists 889', playlists)
 
         if( blogId ) {
-            await BlogService.updateBlog(blogId, blogTitle, blogDescription, blogContent, feature_image, playlists)
+            await BlogService.updateBlog(blogId, blogTitle, blogDescription, blogContent, feature_image, playlists, blogStatus)
         } else {
-            await BlogService.createBlog(blogTitle, blogDescription, blogContent, feature_image, playlists )
+            await BlogService.createBlog(blogTitle, blogDescription, blogContent, feature_image, playlists, blogStatus )
         }
 
         setShowBlogModal(false)
@@ -341,12 +342,16 @@ export default function Blogs() {
         setBlogContent(blog.content)
         setBlogFeatureImage(null)
         setBlogPublicPlaylist(blog.public_playlists && blog.public_playlists.length && blog.public_playlists[0])
-        setBlogPrivatePlaylists(blog.private_playlists)
-
+        // setBlogPublicPlaylist(blog.public_playlists)
+        setBlogPrivatePlaylist(blog.private_playlists && blog.private_playlists.length && blog.private_playlists[0])
+        // setBlogPrivatePlaylist(blog.private_playlists)
+        // setBlogPrivatePlaylists(blog.private_playlists)
+        setBlogStatus(blog.status)
         setShowBlogModal(true)
 
-        console.log('here')
+        console.log('here', blogPublicPlaylist, blogPrivatePlaylist)
     }
+    console.log('here', blogPublicPlaylist, blogPrivatePlaylist)
 
     const removeBlog = (id) => {
         console.log('id', id)
@@ -424,6 +429,7 @@ export default function Blogs() {
                             <TableCell align="center">Image</TableCell>
                             <TableCell align="center">Title</TableCell>
                             <TableCell align="center">Description</TableCell>
+                            <TableCell align="center">Blog Status</TableCell>
                             <TableCell align="center">Public Playlists</TableCell>
                             <TableCell align="center">Private Playlists</TableCell>
                             <TableCell align="center">Operate</TableCell>
@@ -443,6 +449,14 @@ export default function Blogs() {
                                 </TableCell>
                                 <TableCell style={{ width: 200 }} align="center">
                                     {row.description}
+                                </TableCell>
+                                <TableCell style={{ width: 200 }} align="center">                                    
+                                    {row.status==1 &&
+                                        <p>Public</p> 
+                                    }
+                                    {row.status==2 &&
+                                        <p>Private</p>
+                                    }
                                 </TableCell>
                                 <TableCell style={{ width: 150 }} align="center">
                                     {row.public_playlists.length}
@@ -495,14 +509,19 @@ export default function Blogs() {
                 blogFeatureImage={blogFeatureImage}                
                 blogPublicPlaylist={ blogPublicPlaylist }
                 blogPrivatePlaylists={ blogPrivatePlaylists }
+                blogPrivatePlaylist={ blogPrivatePlaylist }
                 publicPlaylists={ blogPublicPlaylists }
                 privatePlaylists={ blogPrivatePlaylists }
+                blogStatus={ blogStatus }
+                blogStatusAll={ blogStatusAll }
                 onSave={saveBlog}
                 setBlogTitle={setBlogTitle}
                 setBlogDescription={setBlogDescription}
                 setBlogContent={setBlogContent}
                 setBlogFeatureImage={setBlogFeatureImage}
+                setBlogStatus={ setBlogStatus }
                 updateBlogPublicPlaylist={updateBlogPublicPlaylist}
+                updateBlogStatus={updateBlogStatus}
                 updateBlogPrivatePlaylists={updateBlogPrivatePlaylists}
             />
         </AppLayout>
