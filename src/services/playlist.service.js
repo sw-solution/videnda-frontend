@@ -7,7 +7,7 @@ const BASE_API_URL = `${GlobalData.back_end_server_ip}:${GlobalData.back_end_ser
 const PLAYLIST_API_URL = `${BASE_API_URL}`
 
 class PlaylistService {
-  
+
   addPlaylist(playlist_title, playlist_status, content_type='video') {
     const currentUser = Auth.getCurrentUser();
     return axios.post(`${PLAYLIST_API_URL}addPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_title=${playlist_title}&playlist_status=${playlist_status}&content_type=${content_type}`);
@@ -21,7 +21,6 @@ class PlaylistService {
       return axios.post(`${PLAYLIST_API_URL}addHistory?video_id=${video_id}`);
     }
   }
-
 
   removePlaylist(id) {
     const currentUser = Auth.getCurrentUser();
@@ -47,6 +46,12 @@ class PlaylistService {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${PLAYLIST_API_URL}getPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
   }
+
+  getPublicBlogPlaylist(playlist_id) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.get(`${PLAYLIST_API_URL}getPublicBlogPlaylist?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
+  }
+
   getBlogPlaylist(playlist_id) {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${PLAYLIST_API_URL}getBlogPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
@@ -56,9 +61,9 @@ class PlaylistService {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${PLAYLIST_API_URL}getPublicPlaylist?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
   }
-  getPublicPlaylistType(playlist_id) {
+  getPlaylistType(playlist_id) {
     const currentUser = Auth.getCurrentUser();
-    return axios.get(`${PLAYLIST_API_URL}getPublicPlaylistType?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
+    return axios.get(`${PLAYLIST_API_URL}getPlaylistType?user_id=${currentUser && currentUser.user_id}&access_key=${currentUser && currentUser.access_key}&playlist_id=${playlist_id}`);
   }
 }
 

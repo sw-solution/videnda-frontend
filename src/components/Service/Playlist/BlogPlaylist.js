@@ -169,15 +169,10 @@ export default () => {
     const [treeData, setTreeData] = useState('');
     const [selected, setSelected] = useState('root');
     const [alertVisible, setAlertVisible] = useState(false);
-    const [expanded, setExpanded] = useState([]);
     const [progressVisible, setProgressVisible] = useState(false);
     const [blogData, setBlogData] = useState([]);
     const [blogInfos, setBlogInfos] = useState([]);
-    const [modalShow, setModalShow] = useState(false);
     const [settingShow, setSettingShow] = useState(false);
-    const [playUrl, setPlayUrl] = useState(null);
-    const [metaTitle, setMetaTitle] = useState(null);
-    const [metaDescription, setMetaDescription] = useState(null);
     const [playlistTitle, setPlaylistTitle] = useState('');
     const [playlistStatus, setPlaylistStatus] = useState(1);
     const [currentPlaylistId, setCurrentPlaylistId] = useState('');
@@ -263,22 +258,6 @@ export default () => {
             setPlaylistTitle(e.target.value);
             upload();
         }
-    }
-
-
-
-    // playlist
-    const handlePlaylist = (e, video_id) => {
-        const playlist_title = e.target.value;
-        let playlist_id = '';
-
-        if (playlist_title != '') {
-            const selectedPlaylist = playlists.find(item => item.playlist_title == playlist_title);
-            playlist_id = selectedPlaylist.playlist_id;
-        }
-
-        // VideoService.changeVideoGroup(video_id, playlist_id);
-        window.location.reload();
     }
 
     const handleItemClick = (item ) => {

@@ -2,7 +2,7 @@ import Modal from 'react-bootstrap/Modal';
 import ReactPlayer from 'react-player';
 import { Paper } from '@material-ui/core';
 
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -40,17 +40,20 @@ const VideoPlayer = (props) => {
     counterCalls = counterCalls + 1;
     const classes = useStyles();
     const ref = React.createRef();
-    	//const [ref, setRef] = useState( React.createRef());
-	/*
-		React.useEffect(()=>{
-			console.log( "useEffect onClickFullScreen ref", ref);
-			if( ref){
-				console.log( "useEffect onClickFullScreen ref.current", ref.current);
-			}
-		});
-		}, [ref]);
-	*/
+	const [seconds, setSeconds] = useState(0);
+	const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+	//const [ref, setRef] = useState( React.createRef());
 
+	/*
+    useEffect(() => {
+		const interval = setInterval(() => {
+			setSeconds(seconds => seconds + 1);
+			onVideoCurrentTime( ref);
+		}, 1000);
+		return () => clearInterval(interval);
+    }, []);
+		.{seconds}s
+	*/
 
     var seek_time = 0;
 
@@ -65,27 +68,46 @@ const VideoPlayer = (props) => {
 		//setPlayingStatus( props.myPlayingStatus);
 	//}
 
+	function handleProgress(){
+		console.log( "handleProgress START");
+		onVideoCurrentTime( ref);
+	}
+
+	const onVideoCurrentTime = (ref) => {
+		//console.log( "onVideoCurrentTime ref", ref);
+		let status = "onVideoCurrentTime START";
+		if( ref){
+			status += "+ref";
+			//console.log( "onVideoCurrentTime ref.current", ref.current);
+			if( ref.current){
+				status += "+current";
+				let current_time = ref.current.getCurrentTime();
+				setVideoCurrentTime( 0 | current_time); //round time
+				//console.log( "onVideoCurrentTime NEXT CHECK", current_time, props.end_marker);
+				if( props.end_marker && current_time > props.end_marker){
+					//!!! miliseconds are decimals at seconds
+					console.log( "onVideoCurrentTime NEXT VIDEO");
+                    setPlayingStatus(true);
+					props.onNextVideo();
+				}
+			}
+		}
+		//called every second
+		//console.log( "onVideoCurrentTime STATUS", status);
+	}
+
 	const onClickFullScreen = (ref) => {
 		console.log( "onClickFullScreen ref", ref);
 		let status = "onClickFullScreen start";
 		if( ref){
 			status += "+ref";
 			console.log( "onClickFullScreen ref.current", ref.current);
-			//console.log( "onClickFullScreen ref.current", ref.current());
-		}
-		if( ref.current){
-			status += "+current";
-			screenfull.request(findDOMNode( ref.current));
-			console.log( "onClickFullScreen ref.current ZERO", ref.current[0]);
-			if( ref.current[0]){
-				status += "+0";
-				screenfull.request( ref.current[0]);
+			if( ref.current){
+				status += "+current";
+				screenfull.request( findDOMNode( ref.current));
 			}
 		}
 		console.log( "onClickFullScreen STATUS", status);
-		//alert( status);
-		//screenfull.request(findDOMNode( ref.current));
-		//screenfull.request(findDOMNode(this.refs.player))
 	}
 
     return (
@@ -104,7 +126,9 @@ const VideoPlayer = (props) => {
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
                     {props.metaTitle}
-                </Modal.Title>
+					...{videoCurrentTime}
+					=={props.end_marker}
+				</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Row>
@@ -118,6 +142,7 @@ const VideoPlayer = (props) => {
                             playing={playingStatus}
                             onPlay={() => setPlayingStatus(true)}
                             onReady={() => { return seek_time && ref.current.seekTo( seek_time )} }
+							onProgress = {handleProgress}
                         />
                         <p><i>{props.metaDescription}</i></p>
                     </Col>
@@ -125,12 +150,18 @@ const VideoPlayer = (props) => {
                         <h5 style={{borderBottom: '1px solid lightgray', paddingBottom: 5, display: 'flex', justifyContent: 'center'}}>Video List</h5>
                         <Paper style={{height: 450, overflow: 'auto'}} key={props.metaTitle}>
                         <List className={classes.root}>
-
-                            {props.videoData.length > 0 &&
-                                props.videoData.map((item, index) => {
-                                    let title = item.manual_title || item.meta_title;
+                            {props.videoData && props.videoData.length > 0 &&
+                                props.videoData.map(( item, index) => {
+                                    let end_marker = "";
+									if( item.end_marker){
+										//end_marker and skip_at_em arrived next to video player
+										end_marker += "[" + item.end_marker;
+										if( item.skip_at_em)
+											end_marker += "-" + item.skip_at_em;
+										end_marker += "]";
+									}
+                                    let title = (item.manual_title || item.meta_title);
                                     let description = item.manual_description || item.meta_description;
-
                                     return (
                                         <div key={index}>
                                             <ListItem alignItems="flex-start"
@@ -155,6 +186,7 @@ const VideoPlayer = (props) => {
                                                             color="textPrimary"
                                                         >
                                                         { description && description.length > 40 ? description.substring(0, 40) + '...' : description}
+                                                        .{end_marker}
                                                         </Typography>
                                                         </React.Fragment>
                                                     }
@@ -177,6 +209,7 @@ const VideoPlayer = (props) => {
 				}}>Close</Button>
                 <Button variant="info" onClick={() =>{
                     setPlayingStatus(true);
+					onVideoCurrentTime(ref);
 					//props.onClickFullScreen(ref);
 					onClickFullScreen(ref);
 					}}>Max</Button>

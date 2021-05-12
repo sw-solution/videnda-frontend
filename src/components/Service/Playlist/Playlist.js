@@ -129,7 +129,7 @@ const SettingDialog = (props) => {
                             )}
                         </Select>
                     </Col>
-                    
+
                     {props.isAdmin &&
                         <Col md={6}>
                             <Select
@@ -181,7 +181,7 @@ export default () => {
     const [currentPlaylistStatus, setCurrentPlaylistStatus] = useState('');
     const [currentPlaylistThumbVideo, setCurrentPlaylistThumbVideo] = useState(0);
     const [currentPlaylistType, setCurrentPlaylistType] = useState(0);
-    
+
     const [playlists, setPlaylists] = useState([]);
     const [videoId, setVideoId] = useState(null);
     // const [playlistId, setPlaylistId] = useState(null);
@@ -192,6 +192,9 @@ export default () => {
 
     const user = authService.getCurrentUser();
     const isAdmin = user && user.roles.includes("ROLE_ADMIN") || false
+
+    const [endMarker, setEndMarker] = useState(0);
+	const [skipAtEndMarker, setSkipAtEndMarker] = useState(0);
 
     React.useEffect(() => {
         getAllPlaylists();
@@ -281,12 +284,16 @@ export default () => {
     }
 
     // Play one video
-    const handlePlayVideo = (video_url, meta_title, meta_description, video_id) => {
+    const handlePlayVideo = (video_url, meta_title, meta_description, video_id,
+    		end_marker, skip_at_em
+    	) => {
         setModalShow(true);
         setPlayUrl(video_url);
         setMetaTitle(meta_title);
         setMetaDescription(meta_description);
         setVideoId(video_id);
+		setEndMarker(end_marker);
+		setSkipAtEndMarker(skip_at_em);
     }
 
     // playlist
@@ -315,6 +322,7 @@ export default () => {
                 if (response.data && response.data.length > 0) {
 
                     const res = response.data;
+                    console.log("getPlaylist", response.data);
 
                     for (const key in res) {
                         const videoId = res[key].id;
@@ -373,9 +381,10 @@ export default () => {
     }
 
     const onNextVideo = () => {
-        const index = videoData.findIndex(item => item.id == videoId);
+        let index = videoData.findIndex(item => item.id == videoId);
         if (index >= videoData.length - 1) {
-            return;
+			index = -1; //restart the whole playlist
+            //return;
         }
         const nextUrl = videoData[index + 1].video_id;
         setVideoId(videoData[index + 1].id);
@@ -383,6 +392,8 @@ export default () => {
         setMetaTitle(videoData[index + 1].meta_title + meta_restriction_age_str(videoData[index + 1].meta_restriction_age))
         setMetaDescription(videoData[index + 1].meta_description)
         setCurrentVideoNumber(getCurrentVideoNumber() + 1)
+		setEndMarker(videoData[index + 1].end_marker);
+		setSkipAtEndMarker(videoData[index + 1].skip_at_em);
     }
 
     const onPreviousVideo = () => {
@@ -396,6 +407,8 @@ export default () => {
         setMetaTitle(videoData[index - 1].meta_title + meta_restriction_age_str(videoData[index - 1].meta_restriction_age))
         setMetaDescription(videoData[index - 1].meta_description)
         setCurrentVideoNumber(getCurrentVideoNumber() - 1)
+		setEndMarker(videoData[index - 1].end_marker);
+		setSkipAtEndMarker(videoData[index - 1].skip_at_em);
     }
 
     const onOpenSourceUrl = () => {
@@ -571,6 +584,8 @@ export default () => {
                 onOpenSourceUrl={onOpenSourceUrl}
                 currentVideoNumber={currentVideoNumber}
                 itemClick={itemClick}
+                end_marker={endMarker}
+                skip_at_em={skipAtEndMarker}
             />
             <SettingDialog
                 show={settingShow}
@@ -609,14 +624,20 @@ const VideoList = (props) => {
     props.playlists.map(item=>{
         playlists.push({id: item.id, name: item.playlist_title});
     });
-    
+
     const user = authService.getCurrentUser();
     const isAdmin = user && user.roles.includes("ROLE_ADMIN") || false
 
     const renderItem = (data) => (
         <ListGroup.Item key={data.id}>
             <Media>
-                <Image thumbnail src={data.meta_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.manual_description || data.meta_description, data.id)} />
+                <Image thumbnail src={data.meta_image} className="mr-3" style={{ cursor: 'pointer' }}
+                	onClick={() => props.handlePlayVideo(
+						data.video_id,
+						data.manual_title || data.meta_title,
+						data.manual_description || data.meta_description,
+						data.id,
+						data.end_marker, data.skip_at_em)} />
                 <Media.Body>
                     <h5><span style={{ color: 'green' }}>{data.manual_title && data.manual_title}</span></h5>
                     <h5><span>{data.meta_title}</span></h5>
@@ -630,7 +651,14 @@ const VideoList = (props) => {
 
                     <Row>
                         <Col className="align-self-end pb-4">
-                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.manual_description || data.meta_description, data.id)}>Play</Button>
+                            <Button variant="success" size="sm" className="mr-2"
+                            	onClick={() => props.handlePlayVideo(
+									data.video_id,
+									data.manual_title || data.meta_title,
+									data.manual_description || data.meta_description,
+									data.id,
+									data.end_marker, data.skip_at_em
+									)}>Play</Button>
                             <Button variant="info" size="sm" className="mr-2"
                                 onClick={() => {
                                     props.setManualTitle(data.manual_title ? data.manual_title : data.meta_title);
@@ -638,10 +666,9 @@ const VideoList = (props) => {
                                     props.setEditShow(true);
                                     props.setVideoId(data.id);
                                 }}
-                            >
-                                Edit
-                            </Button>
-                            <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                            >Edit</Button>
+                            <Button variant="danger" size="sm"
+                            	onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&
@@ -654,7 +681,7 @@ const VideoList = (props) => {
                                     multiple={true}
                                 />
                             }
-                            { isAdmin && 
+                            { isAdmin &&
                                 <SelectOptions
                                     label='Type'
                                     id={data.id}

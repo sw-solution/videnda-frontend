@@ -62,8 +62,8 @@ class BlogService {
   getSingleBlog(id) {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${blog_API_URL}getSingleBlog/${id}`,{params: {
-      user_id: currentUser.user_id,
-      user_key: currentUser.access_key,
+      user_id: currentUser && currentUser.user_id,
+      user_key: currentUser && currentUser.access_key,
     }});
   }
 

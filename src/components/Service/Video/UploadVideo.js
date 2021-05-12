@@ -77,6 +77,9 @@ const VideoUpload = () => {
     const [manualTitle, setManualTitle] = useState(undefined);
     const [manualDescription, setManualDescription] = useState(undefined);
     //const [myPlayingStatus, setMyPlayingStatus] = useState(false);
+    const [endMarker, setEndMarker] = useState(0);
+	const [skipAtEndMarker, setSkipAtEndMarker] = useState(0);
+
 
     useEffect(() => {
         setExpand()
@@ -461,19 +464,24 @@ const VideoUpload = () => {
     }
 
     // Play one video
-    const handlePlayVideo = (video_url, meta_title, videoId, meta_restriction_age, meta_description) => {
+    const handlePlayVideo = ( video_url, meta_title, videoId,
+    		meta_restriction_age, meta_description,
+    		end_marker, skip_at_em) => {
         //setMyPlayingStatus(true);
-        setModalShow(true);
-        setPlayUrl(video_url);
-        setMetaTitle(meta_title);
-        setMetaDescription(meta_description);
+        setModalShow( true);
+        setPlayUrl( video_url);
+        setMetaTitle( meta_title);
+        setMetaDescription( meta_description);
         setVideoId(videoId);
+		setEndMarker(end_marker);
+		setSkipAtEndMarker(skip_at_em);
     }
 
     const onNextVideo = () => {
-        const index = videoData.findIndex(item => item.id == videoId);
+        let index = videoData.findIndex(item => item.id == videoId);
         if (index >= videoData.length - 1) {
-            return;
+            index = -1;
+            //return;
         }
         const nextUrl = videoData[index + 1].video_id;
         setVideoId(videoData[index + 1].id);
@@ -481,6 +489,8 @@ const VideoUpload = () => {
         setMetaTitle(videoData[index + 1].meta_title + meta_restriction_age_str(videoData[index + 1].meta_restriction_age))
         setMetaDescription(videoData[index + 1].meta_description)
         setCurrentVideoNumber(getCurrentVideoNumber() + 1)
+		setEndMarker(videoData[index + 1].end_marker);
+		setSkipAtEndMarker(videoData[index + 1].skip_at_em);
     }
 
     const onPreviousVideo = () => {
@@ -494,6 +504,8 @@ const VideoUpload = () => {
         setMetaTitle(videoData[index - 1].meta_title + meta_restriction_age_str(videoData[index - 1].meta_restriction_age))
         setMetaDescription(videoData[index - 1].meta_description)
         setCurrentVideoNumber(getCurrentVideoNumber() - 1)
+		setEndMarker(videoData[index - 1].end_marker);
+		setSkipAtEndMarker(videoData[index - 1].skip_at_em);
     }
 
     function beep() {
@@ -517,7 +529,8 @@ const VideoUpload = () => {
         setPlayUrl(video_id);
         setVideoId(videoId);
         setMetaTitle(videoData.find(item => item.id == videoId).meta_title);
-        setMetaDescription(videoData.find(item => item.id == videoId).meta_description);
+        setEndMarker(videoData.find(item => item.id == videoId).end_marker);
+        setSkipAtEndMarker(videoData.find(item => item.id == videoId).skipAtEndMarker);
     }
 
     // playlist
@@ -654,6 +667,8 @@ const VideoUpload = () => {
                 onPreviousVideo={onPreviousVideo}
 				//onClickFullScreen={onClickFullScreen}
                 //myPlayingStatus={true}
+                end_marker={endMarker}
+                skip_at_em={skipAtEndMarker}
             />
             <EditDialog
                 show={editShow}
@@ -681,9 +696,105 @@ const VideoList = (props) => {
     const isAdmin = user && user.roles.includes("ROLE_ADMIN") || false
 
     const renderItem = (data) => (
+        <div class="list-group-item mx-0 my-0 px-0 py-0" key={data.id} >
+			{
+				//is responsive now with class="img-fluid img-thumbnail float-left"
+				// and image and text in the same section -  - video_100_flex-1
+				// d-flex flex-wrap mx-0 my-0 px-0 py-0
+				//Torma = Image was <Image className="mr-3"
+			}
+			<div class="container-fluid d-flex flex-wrap mx-0 my-0 px-0 py-0">
+                <section>
+                	<img thumbnail src={data.meta_image}
+                		class="img-fluid img-thumbnail float-left"
+						style={{ cursor: 'pointer' }}
+						onClick={() => props.handlePlayVideo(
+							data.video_id,
+							data.manual_title || data.meta_title,
+							data.id,
+							data.meta_restriction_age,
+							data.manual_description || data.meta_description,
+							data.end_marker, data.skip_at_em)
+						} />
+                	/>
+                    <h5><span style={{ color: 'green' }}>{data.manual_title && data.manual_title}</span></h5>
+                    <h5><span>{data.meta_title}</span></h5>
+                    <p style={{ marginBottom: "0px" }}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
+                    <p style={{ marginBottom: "2px" }}><span style={{ color: 'green' }}>{data.manual_description && data.manual_description}</span></p>
+                    <p style={{ marginBottom: "2px" }}><span>{data.meta_description}</span></p>
+                    {data.meta_keyword && (
+                        <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
+                    )}
+                    <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
+
+                    <Row>
+                        <Col className="align-self-end pb-4">
+                            <Button variant="success" size="sm" className="mr-2"
+                            	onClick={() => props.handlePlayVideo(
+									data.video_id,
+									data.manual_title || data.meta_title,
+									data.id,
+									data.meta_restriction_age,
+                            		data.manual_description || data.meta_description,
+									data.end_marker, data.skip_at_em)
+                            	}>Play</Button>
+                            <Button variant="info" size="sm" className="mr-2"
+                                onClick={() => {
+                                    props.setManualTitle( data.manual_title ? data.manual_title : data.meta_title);
+                                    props.setManualDescription(
+										data.manual_description ? data.manual_description : data.meta_description);
+                                    props.setEditShow( true);
+                                    props.setVideoId(  data.id);
+                                }}
+                            >
+                                Edit
+                            </Button>
+                            {/* <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove 0</Button> */}
+                            <Button variant="danger" size="sm" onClick={() => { props.handleRemoveItem(data.id) } } >Remove</Button>
+                        </Col>
+                        <Col>
+                            {props.playlists.length > 0 &&
+                                <SelectOptions
+                                    label='Playlists'
+                                    id={data.id}
+                                    value={data.arr}
+                                    items={playlists}
+                                    onSave={props.savePlaylist}
+                                    multiple={true}
+                                />
+                            }
+                            { isAdmin &&
+                                <SelectOptions
+                                    label='Type'
+                                    id={data.id}
+                                    value={data.type}
+                                    items={[
+                                        {id: 'free', name: 'Free'},
+                                        {id: 'pro', name: 'Pro'}
+                                        ]}
+                                    onSave={props.setVideoType}
+                                    multiple={false}
+                                />
+                            }
+                        </Col>
+                    </Row>
+                </section>
+            </div>
+        </div>
+    );
+
+    const renderItemTorma = (data) => (
         <ListGroup.Item key={data.id}>
             <Media>
-                <Image thumbnail src={data.meta_image} className="mr-3" style={{ cursor: 'pointer' }} onClick={() => props.handlePlayVideo(data.video_id, data.manual_title || data.meta_title, data.id, data.meta_restriction_age, data.manual_description || data.meta_description)} />
+                <Image thumbnail src={data.meta_image} className="mr-3" style={{ cursor: 'pointer' }}
+                	onClick={() => props.handlePlayVideo(
+						data.video_id,
+						data.manual_title || data.meta_title,
+						data.id,
+						data.meta_restriction_age,
+						data.manual_description || data.meta_description,
+						data.end_marker, data.skip_at_em)
+					} />
                 <Media.Body>
                     <h5><span style={{ color: 'green' }}>{data.manual_title && data.manual_title}</span></h5>
                     <h5><span>{data.meta_title}</span></h5>
@@ -698,9 +809,14 @@ const VideoList = (props) => {
                     <Row>
                         <Col className="align-self-end pb-4">
                             <Button variant="success" size="sm" className="mr-2"
-                            	onClick={() => props.handlePlayVideo(data.video_id, data.manual_title ||
-                            		data.meta_title, data.id, data.meta_restriction_age,
-                            		data.manual_description || data.meta_description)}>Play</Button>
+                            	onClick={() => props.handlePlayVideo(
+									data.video_id,
+									data.manual_title || data.meta_title,
+									data.id,
+									data.meta_restriction_age,
+                            		data.manual_description || data.meta_description,
+									data.end_marker, data.skip_at_em)
+                            	}>Play</Button>
                             <Button variant="info" size="sm" className="mr-2"
                                 onClick={() => {
                                     props.setManualTitle( data.manual_title ? data.manual_title : data.meta_title);
@@ -781,12 +897,13 @@ const VideoList = (props) => {
                         ),
                     }}
                 />
-                <h3 className="card-header">List of Videos</h3>
+                <h3 className="card-header">List of Videos U1</h3>
                 <ListGroup variant="flush">
-                    {props.videoInfos
+                    { props.videoInfos
                         && props.videoInfos.map((video, index) => {
-                            if ((props.currentPage - 1) * props.itemsPerPage <= index && (props.currentPage) * props.itemsPerPage > index) {
-                                return renderItem(video)
+                            if (( props.currentPage - 1) * props.itemsPerPage <= index
+                            	&& (props.currentPage) * props.itemsPerPage > index) {
+                                	return renderItem(video)
                             } else {
                                 return null
                             }
