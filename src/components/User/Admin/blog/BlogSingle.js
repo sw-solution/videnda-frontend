@@ -19,7 +19,6 @@ import VideoPlayer from '../../../Service/Video/VideoPlayer';
 import Alert from '@material-ui/lab/Alert';
 import MButton from '@material-ui/core/Button';
 
-
 import {
     Image,
     Button,
@@ -29,6 +28,7 @@ import {
     Media,
 } from 'react-bootstrap';
 
+import AuthService from "../../../../services/auth.service";
 import PlaylistService from '../../../../services/playlist.service';
 import BlogService from '../../../../services/blog.service';
 import AppLayout from '../../../../layouts/App';
@@ -81,6 +81,14 @@ export default (props) => {
     }, [props])
 
     const getAllBlog = () => {
+        const user = AuthService.getCurrentUser();
+        // console.log(user);
+        if(user) {
+            // loggedIn=1
+        }else{
+            // loggedIn=0
+            history.push("/404");
+        }
         if (playlistId != null)
         BlogService.getSingleBlog(playlistId)
                 .then(async response => {
