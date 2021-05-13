@@ -104,7 +104,6 @@ TablePaginationActions.propTypes = {
 };
 
 const BlogModal = (props) => {
-    console.log('propsxy',props)
     return (
         <Modal
             show={props.show}
@@ -149,15 +148,16 @@ const BlogModal = (props) => {
                             />
                         </Col>
                     }
+
                     {props.publicPlaylists &&
                         <Col md={6} style={{marginTop: 15}}>
                             <SelectOptions
                                 label='Public Playlists'
                                 id={props.id}
-                                value={props.blogPublicPlaylist}
+                                value={props.currentPublicPlaylists}
                                 items={props.publicPlaylists}
                                 onSave={props.updateBlogPublicPlaylist}
-                                multiple={false}
+                                multiple={true}
                             />
                         </Col>
                     }
@@ -167,7 +167,7 @@ const BlogModal = (props) => {
                             <SelectOptions
                                 label='Private Playlists'
                                 id={props.id}
-                                value={props.blogPrivatePlaylists}
+                                value={props.currentPrivatePlaylists}
                                 items={props.privatePlaylists}
                                 onSave={props.updateBlogPrivatePlaylists}
                                 multiple={true}
@@ -223,6 +223,9 @@ export default function Blogs() {
     const [blogPublicPlaylist, setBlogPublicPlaylist] = useState();
     const [blogPrivatePlaylist, setBlogPrivatePlaylist] = useState([]);
 
+    const [currentPrivatePlaylists, setCPrivatePlaylists] = useState([]);
+    const [currentPublicPlaylists, setCurrentPublicPlaylists] = useState([]);
+
     useEffect(() => {
         if (!isLoaded) {
             getAllBlog();
@@ -232,10 +235,8 @@ export default function Blogs() {
     })
     
     const getAllBlog = () => {
-        // console.log('preGetAllBlog')
         BlogService.getAllBlogList()
             .then(result => {
-                // console.log('AllBlog', result.data)
                 setRows(result.data)
                 setData(result.data)
             })
@@ -244,7 +245,6 @@ export default function Blogs() {
     const getAllPlaylists = () => {
         PlaylistService.getAllBlogPlaylist()
             .then(async response => {
-                console.log('GetPlaylist',response.data)
                 if (response.data && response.data.length > 0) {
                     let privatePlaylists = [];
                     let publicPlaylists = [];
@@ -257,7 +257,6 @@ export default function Blogs() {
 
                     setBlogPublicPlaylists(publicPlaylists);
                     setBlogPrivatePlaylists(privatePlaylists);
-                    console.log(publicPlaylists, 'Playlists', privatePlaylists)
                 }
             })
     }
@@ -277,19 +276,23 @@ export default function Blogs() {
     const updateBlogPublicPlaylist = (id, value) => {
         
         if( value )
-            setBlogPublicPlaylist(value)
+        setCurrentPublicPlaylists(value)
         else
-            setBlogPublicPlaylist()
+        setBlogPublicPlaylist()
     }
     const updateBlogStatus = (id, value) => {
         
         if( value )
             setBlogStatus(value)        
     }
-
+    
     const updateBlogPrivatePlaylists = (id, value) => {
-        setBlogPrivatePlaylists(value)
-    }
+        
+        if( value )
+            setCPrivatePlaylists(value)
+        else
+            setBlogPrivatePlaylist()
+        }
 
     const saveBlog = async () => {
         setRows([])
@@ -297,25 +300,19 @@ export default function Blogs() {
 
         let feature_image = '';
         if( blogFeatureImage ) {
-            console.log(blogFeatureImage)
             feature_image = await BlogService.uploadThumbnail(blogFeatureImage);
         }
-        console.log(blogFeatureImage)
-        console.log(feature_image)
+
         let playlists = [];
 
-        blogPublicPlaylists.map(plist=>{
-            playlists.push(plist.id)
-        })
-        blogPrivatePlaylists.map(pplist=>{
-            playlists.push(pplist.id)
-        })
-        // if( blogPublicPlaylists > 0 )
-            // playlists = [blogPublicPlaylists, ...blogPrivatePlaylists];
-        // else
-        //     playlists = [...blogPrivatePlaylists];
 
-        console.log('playlists 889', playlists)
+        currentPublicPlaylists.map(plist=>{
+            playlists.push(plist)
+        })
+        currentPrivatePlaylists.map(pplist=>{
+            playlists.push(pplist)
+        })
+
 
         if( blogId ) {
             await BlogService.updateBlog(blogId, blogTitle, blogDescription, blogContent, feature_image, playlists, blogStatus)
@@ -329,12 +326,11 @@ export default function Blogs() {
     }
 
     const editBlog = (id) => {
-        console.log(id)
-        console.log(rows)
+
         resetBlogData()
 
         const blog = rows.filter(item => item.id == id)[0];
-        console.log('blog', blog)
+
 
         setBlogId(blog.id)
         setBlogTitle(blog.title)
@@ -342,19 +338,17 @@ export default function Blogs() {
         setBlogContent(blog.content)
         setBlogFeatureImage(null)
         setBlogPublicPlaylist(blog.public_playlists && blog.public_playlists.length && blog.public_playlists[0])
-        // setBlogPublicPlaylist(blog.public_playlists)
+
         setBlogPrivatePlaylist(blog.private_playlists && blog.private_playlists.length && blog.private_playlists[0])
-        // setBlogPrivatePlaylist(blog.private_playlists)
-        // setBlogPrivatePlaylists(blog.private_playlists)
+
         setBlogStatus(blog.status)
         setShowBlogModal(true)
+        setCurrentPublicPlaylists(blog.public_playlists)
+        setCPrivatePlaylists(blog.private_playlists)                
 
-        console.log('here', blogPublicPlaylist, blogPrivatePlaylist)
     }
-    console.log('here', blogPublicPlaylist, blogPrivatePlaylist)
 
     const removeBlog = (id) => {
-        console.log('id', id)
         if (window.confirm('Are you sure?')) {
             setRows([])
             setData([])
@@ -369,7 +363,6 @@ export default function Blogs() {
                     err.response.data &&
                     err.response.data.message
                 ) || err.toString();
-                console.log(resMessage);
             });
         }
     }
@@ -512,6 +505,8 @@ export default function Blogs() {
                 blogPrivatePlaylist={ blogPrivatePlaylist }
                 publicPlaylists={ blogPublicPlaylists }
                 privatePlaylists={ blogPrivatePlaylists }
+                currentPublicPlaylists={ currentPublicPlaylists }
+                currentPrivatePlaylists={ currentPrivatePlaylists }
                 blogStatus={ blogStatus }
                 blogStatusAll={ blogStatusAll }
                 onSave={saveBlog}
