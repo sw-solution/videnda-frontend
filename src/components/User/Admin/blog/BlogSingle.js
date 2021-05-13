@@ -83,16 +83,18 @@ export default (props) => {
     const getAllBlog = () => {
         const user = AuthService.getCurrentUser();
         // console.log(user);
-        if(user) {
-            // loggedIn=1
-        }else{
-            // loggedIn=0
-            history.push("/404");
+        if(!user) {            
+            // history.push("/signin");
         }
         if (playlistId != null)
         BlogService.getSingleBlog(playlistId)
                 .then(async response => {
-                    console.log(response)
+                    console.log('response.data',response.data)
+                    if(!user) {            
+                        if(response.data[0].status==2) {
+                            history.push("/signin");                        
+                        }
+                    }
                     if (response.data && response.data.length > 0) {
 
                         setBlogData(response.data)
