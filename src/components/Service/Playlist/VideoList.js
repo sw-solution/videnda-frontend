@@ -84,10 +84,8 @@ export default (props) => {
     }, [props])
 
     const getAllVideos = () => {
-        console.log('getAllVideos START', playlistId);
         let loggedIn
         const user = AuthService.getCurrentUser();
-        // console.log(user);
         if(user) {
             loggedIn=1
         }else{
@@ -96,11 +94,15 @@ export default (props) => {
         }
             PlaylistService.getPlaylistType(playlistId)
                 .then(async response => {
-                    console.log('content_type', response.data)
-                    if (response.data == 'blog') {
+
+                    if(response.data.playlist_status==0){
+                        if(!user) 
+                        history.push("/signin")
+                    }
+
+                    if (response.data.content_type == 'blog') {
                         PlaylistService.getPublicBlogPlaylist(playlistId, loggedIn)
                             .then(async resp => {
-                                console.log('respBlogPlayst', resp)
                                 setVideoData(resp.data)
                                 setVideoInfos(resp.data);
                                 setContentType('Blog')
@@ -119,7 +121,6 @@ export default (props) => {
                             })
                     }
                 }).catch(error => {
-                    console.log('error', error)
                     if (error.response) {
                         if (error.response.status == 401)
                             history.push("/signin");
@@ -205,7 +206,6 @@ export default (props) => {
                 setVideoId(videoId);
                 setEndMarker(end_marker);
                 setSkipAtEndMarker(skip_at_em);
-                console.log("VideoList handlePlayVideo end_marker", end_marker);
             })
             .catch((err) => {
                 const resMessage = (
@@ -222,7 +222,6 @@ export default (props) => {
     }
     const handlePlayBlog = (blogId) => {
         let nextUrl = '../blog/' + blogId
-        console.log(blogId, nextUrl)
         window.open(nextUrl, '_blank');
     }
 
